@@ -1,100 +1,169 @@
-# DigitekShop - فروشگاه آنلاین لوازم الکترونیک
+# DigitekShop - Online Electronics Store
 
-## 🏗️ معماری پروژه
+A modern online electronics store built with .NET Core, following Clean Architecture and Domain-Driven Design (DDD) principles.
 
-این پروژه با استفاده از **Clean Architecture** و **Domain-Driven Design (DDD)** پیاده‌سازی شده است.
+## 🏗️ Architecture
 
-### 📁 ساختار پروژه
+This project follows Clean Architecture principles with a strong focus on Domain-Driven Design:
 
 ```
 DigitekShop/
-├── src/
-│   ├── Core/
-│   │   ├── DigitekShop.Domain/          # لایه دامین
-│   │   └── DigitekShop.Application/     # لایه اپلیکیشن
-│   ├── Infrastructure/                  # لایه زیرساخت
-│   ├── API/                             # لایه API
-│   └── UI/                              # لایه رابط کاربری
-└── tests/                               # تست‌ها
+├── DigitekShop.Domain/          # Domain Layer (Core Business Logic)
+├── DigitekShop.Application/     # Application Layer (Use Cases)
+├── DigitekShop.Infrastructure/  # Infrastructure Layer (External Concerns)
+└── DigitekShop.Web/            # Presentation Layer (API/Web)
 ```
 
-## 🎯 لایه دامین (Domain Layer)
+## 🎯 Domain Layer Features
 
-### 📦 موجودیت‌ها (Entities)
-- **Product**: محصولات فروشگاه
-- **Category**: دسته‌بندی محصولات
-- **Customer**: مشتریان
-- **Order**: سفارشات
-- **OrderItem**: آیتم‌های سفارش
-- **Brand**: برندها
-- **Review**: نظرات محصولات
-- **Wishlist**: لیست علاقه‌مندی‌ها
-- **ProductSpecification**: مشخصات فنی محصولات
+### Entities
+- **Product**: Electronics products with specifications
+- **Order**: Customer orders with items
+- **Customer**: User accounts and profiles
+- **Category**: Product categorization
+- **Brand**: Product brands
+- **Review**: Product reviews and ratings
+- **Wishlist**: Customer wishlists
+- **OrderItem**: Individual items in orders
 
-### 💎 Value Objects
-- **ProductName**: نام محصول
-- **Money**: مقادیر پولی
-- **SKU**: کد محصول
-- **Email**: ایمیل
-- **PhoneNumber**: شماره تلفن
-- **Address**: آدرس
-- **OrderNumber**: شماره سفارش
+### Value Objects
+- **Money**: Currency and amount handling
+- **Email**: Email validation and formatting
+- **PhoneNumber**: Iranian phone number support
+- **Address**: Iranian address structure
+- **ProductName**: Product naming conventions
+- **SKU**: Stock keeping unit
+- **OrderNumber**: Unique order identifiers
 
-### 🔄 Repository Pattern
-- **IGenericRepository<T>**: Repository عمومی برای عملیات CRUD
-- **IProductRepository**: Repository خاص محصولات
-- **ICategoryRepository**: Repository خاص دسته‌بندی‌ها
-- **ICustomerRepository**: Repository خاص مشتریان
-- **IOrderRepository**: Repository خاص سفارشات
-- **IBrandRepository**: Repository خاص برندها
-- **IReviewRepository**: Repository خاص نظرات
-- **IWishlistRepository**: Repository خاص لیست علاقه‌مندی‌ها
+### Domain Services
+- **OrderDomainService**: Order-related business logic
+- **ProductDomainService**: Product-related business logic
+- **DiscountCalculatorService**: Discount calculations
 
-### 🎭 Enums
-- **ProductStatus**: وضعیت محصول
-- **CategoryType**: نوع دسته‌بندی
-- **CustomerStatus**: وضعیت مشتری
-- **OrderStatus**: وضعیت سفارش
-- **PaymentMethod**: روش پرداخت
+### Specifications
+- **ProductSpecifications**: Product filtering and querying
+- **OrderSpecifications**: Order filtering and querying
 
-## 🚀 ویژگی‌های کلیدی
+### Business Rules
+- **OrderBusinessRules**: Order validation rules
+- **BusinessRuleValidator**: Rule validation engine
 
-### ✅ Clean Architecture
-- **جداسازی لایه‌ها**: هر لایه مسئولیت مشخصی دارد
-- **وابستگی یکطرفه**: لایه‌های داخلی به لایه‌های خارجی وابسته نیستند
-- **قابلیت تست**: هر لایه به صورت مستقل قابل تست است
+### Policies
+- **DiscountPolicies**: Various discount strategies
+- **IDiscountPolicy**: Discount policy interface
 
-### ✅ Domain-Driven Design
-- **Rich Domain Model**: موجودیت‌ها دارای رفتار هستند
-- **Value Objects**: برای مقادیر غیرقابل تغییر
-- **Business Methods**: متدهای تجاری در موجودیت‌ها
-- **Encapsulation**: محافظت از داده‌ها
+### Domain Events
+- **OrderCreatedEvent**: Order creation notifications
+- **ProductCreatedEvent**: Product creation notifications
+- **OrderStatusChangedEvent**: Status change notifications
+- **ProductStockUpdatedEvent**: Stock update notifications
+- **CustomerRegisteredEvent**: Registration notifications
 
-### ✅ Repository Pattern
-- **Generic Repository**: عملیات CRUD عمومی
-- **Specific Repository**: عملیات خاص هر موجودیت
-- **Abstraction**: جداسازی منطق دسترسی به داده
+### Aggregates
+- **OrderAggregate**: Order aggregate root
 
-## 🛠️ تکنولوژی‌های استفاده شده
+### Exceptions
+- **DomainException**: Base domain exception
+- **ProductNotFoundException**: Product not found
+- **OrderNotFoundException**: Order not found
+- **CustomerNotFoundException**: Customer not found
+- **InsufficientStockException**: Stock validation
+- **InvalidOrderStatusException**: Status transition validation
 
-- **.NET 8**
-- **C# 12**
-- **Entity Framework Core**
-- **Clean Architecture**
-- **Domain-Driven Design**
+## 🚀 Getting Started
 
-## 📋 مراحل بعدی
+### Prerequisites
+- .NET 8.0 SDK or later
+- Visual Studio 2022 or VS Code
+- Git
 
-- [ ] پیاده‌سازی Infrastructure Layer
-- [ ] پیاده‌سازی Application Layer
-- [ ] پیاده‌سازی API Layer
-- [ ] پیاده‌سازی UI Layer
-- [ ] اضافه کردن تست‌ها
+### Installation
 
-## 👨‍💻 توسعه‌دهنده
+1. Clone the repository:
+```bash
+git clone https://github.com/yourusername/DigitekShop.git
+cd DigitekShop
+```
 
-این پروژه با راهنمایی و پیاده‌سازی Clean Architecture و DDD ایجاد شده است.
+2. Restore dependencies:
+```bash
+dotnet restore
+```
+
+3. Build the solution:
+```bash
+dotnet build
+```
+
+## 📁 Project Structure
+
+### Domain Layer (`DigitekShop.Domain`)
+The core business logic layer containing:
+- **Entities**: Core business objects
+- **Value Objects**: Immutable objects representing concepts
+- **Domain Services**: Business logic that spans multiple entities
+- **Specifications**: Query specifications for filtering
+- **Business Rules**: Validation rules
+- **Policies**: Business policies and strategies
+- **Domain Events**: Event-driven architecture support
+- **Aggregates**: Aggregate roots for consistency
+- **Exceptions**: Domain-specific exceptions
+
+### Application Layer (`DigitekShop.Application`)
+The application layer containing:
+- **DTOs**: Data transfer objects
+- **Profiles**: AutoMapper profiles
+- **Use Cases**: Application services and handlers
+
+## 🎨 Design Patterns
+
+### Domain-Driven Design (DDD)
+- **Entities**: Rich domain models with behavior
+- **Value Objects**: Immutable objects for concepts
+- **Aggregates**: Consistency boundaries
+- **Domain Services**: Business logic services
+- **Specifications**: Query specifications
+- **Domain Events**: Event-driven architecture
+
+### Clean Architecture
+- **Dependency Inversion**: High-level modules don't depend on low-level modules
+- **Separation of Concerns**: Clear boundaries between layers
+- **Testability**: Easy to test business logic in isolation
+
+## 🔧 Development
+
+### Adding New Features
+1. Start with the Domain layer
+2. Define entities and value objects
+3. Implement business rules and validation
+4. Add domain services if needed
+5. Create specifications for querying
+6. Implement in Application layer
+7. Add infrastructure concerns
+
+### Testing
+The domain layer is designed for easy testing:
+- Value objects are immutable and easily testable
+- Business rules can be tested in isolation
+- Domain services have clear contracts
+- Specifications can be tested independently
+
+## 📝 Contributing
+
+1. Fork the repository
+2. Create a feature branch
+3. Make your changes
+4. Add tests if applicable
+5. Submit a pull request
+
+## 📄 License
+
+This project is licensed under the MIT License - see the LICENSE file for details.
+
+## 🤝 Support
+
+If you have any questions or need help, please open an issue on GitHub.
 
 ---
 
-**نکته**: این پروژه در حال توسعه است و ممکن است تغییراتی در ساختار آن اعمال شود. 
+**Note**: This project is currently in development. The Domain layer is complete with comprehensive DDD patterns, and the Application layer is being developed. 
