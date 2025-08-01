@@ -23,7 +23,7 @@ namespace DigitekShop.Domain.Entities
         // Constructor
         private Review() { }
 
-        public Review(int customerId, int productId, int rating, string title, string comment)
+        public Review(int customerId, int productId, int rating, string title, string comment, bool isVerifiedPurchase = false)
         {
             if (rating < 1 || rating > 5)
                 throw new ArgumentException("Rating must be between 1 and 5");
@@ -36,10 +36,11 @@ namespace DigitekShop.Domain.Entities
             Rating = rating;
             Title = title.Trim();
             Comment = comment?.Trim() ?? "";
-            IsVerified = false;
+            IsVerified = isVerifiedPurchase;
             IsHelpful = false;
             HelpfulCount = 0;
             IsApproved = false;
+            AdminResponse = "";
             SetUpdated();
         }
 

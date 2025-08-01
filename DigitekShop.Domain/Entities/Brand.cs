@@ -27,10 +27,12 @@ namespace DigitekShop.Domain.Entities
             Products = new List<Product>();
         }
 
-        public Brand(ProductName name, string description, string country = "", int foundedYear = 0)
+        public Brand(ProductName name, string description, string? logoUrl = null, string? website = null, string country = "", int foundedYear = 0)
         {
             Name = name;
             Description = description ?? "";
+            LogoUrl = logoUrl ?? "";
+            Website = website ?? "";
             Country = country?.Trim() ?? "";
             FoundedYear = foundedYear;
             IsActive = true;

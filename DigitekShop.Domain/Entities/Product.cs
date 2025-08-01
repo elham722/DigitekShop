@@ -19,7 +19,6 @@ namespace DigitekShop.Domain.Entities
         public string ImageUrl { get; private set; }
         public ProductStatus Status { get; private set; }
         public decimal Weight { get; private set; }
-        public string Brand { get; private set; }
         public string Model { get; private set; }
 
         // Navigation Properties

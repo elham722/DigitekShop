@@ -179,7 +179,7 @@ namespace DigitekShop.Domain.Entities
         
         public TimeSpan? GetDeliveryTime()
         {
-            if (DeliveredAt.HasValue && CreatedAt.HasValue)
+            if (DeliveredAt.HasValue)
                 return DeliveredAt.Value - CreatedAt;
             return null;
         }

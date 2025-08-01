@@ -36,8 +36,8 @@ namespace DigitekShop.Domain.Entities
             Wishlists = new List<Wishlist>();
         }
 
-        public Customer(string firstName, string lastName, Email email, PhoneNumber phone, 
-            Address address, string nationalCode = "")
+        public Customer(string firstName, string lastName, DateTime? dateOfBirth, string nationalCode, 
+            Email email, PhoneNumber phone, string? profileImageUrl = null, string? notes = null)
         {
             if (string.IsNullOrWhiteSpace(firstName))
                 throw new ArgumentException("First name cannot be empty");
@@ -47,10 +47,12 @@ namespace DigitekShop.Domain.Entities
 
             FirstName = firstName.Trim();
             LastName = lastName.Trim();
+            DateOfBirth = dateOfBirth;
+            NationalCode = nationalCode?.Trim() ?? "";
             Email = email;
             Phone = phone;
-            Address = address;
-            NationalCode = nationalCode?.Trim() ?? "";
+            ProfileImageUrl = profileImageUrl ?? "";
+            Notes = notes ?? "";
             Status = CustomerStatus.PendingVerification;
             IsEmailVerified = false;
             IsPhoneVerified = false;
