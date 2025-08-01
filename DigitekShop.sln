@@ -19,6 +19,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DigitekShop.Domain", "Digit
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DigitekShop.Application", "DigitekShop.Application\DigitekShop.Application.csproj", "{B29736C9-1177-4A0F-ABE1-DA5FCDA1F982}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DigitekShop.Infrastructure", "DigitekShop.Infrastructure\DigitekShop.Infrastructure.csproj", "{BA556192-A6E5-4E87-BDBE-64D8C37A0F03}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -33,6 +35,10 @@ Global
 		{B29736C9-1177-4A0F-ABE1-DA5FCDA1F982}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B29736C9-1177-4A0F-ABE1-DA5FCDA1F982}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B29736C9-1177-4A0F-ABE1-DA5FCDA1F982}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BA556192-A6E5-4E87-BDBE-64D8C37A0F03}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BA556192-A6E5-4E87-BDBE-64D8C37A0F03}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BA556192-A6E5-4E87-BDBE-64D8C37A0F03}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BA556192-A6E5-4E87-BDBE-64D8C37A0F03}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
