@@ -6,12 +6,12 @@ namespace DigitekShop.Domain.Interfaces
 {
     public interface ICustomerRepository : IGenericRepository<Customer>
     {
-        Task<Customer> GetByEmailAsync(Email email);
-        Task<Customer> GetByPhoneAsync(PhoneNumber phone);
-        Task<IEnumerable<Customer>> GetByStatusAsync(CustomerStatus status);
-        Task<IEnumerable<Customer>> GetActiveCustomersAsync();
-        Task<IEnumerable<Customer>> SearchByNameAsync(string searchTerm);
-        Task<bool> ExistsByEmailAsync(Email email);
-        Task<bool> ExistsByPhoneAsync(PhoneNumber phone);
+        Task<Customer> GetByEmailAsync(Email email, CancellationToken cancellationToken = default);
+        Task<Customer> GetByPhoneAsync(PhoneNumber phone, CancellationToken cancellationToken = default);
+        Task<IEnumerable<Customer>> GetByStatusAsync(CustomerStatus status, CancellationToken cancellationToken = default);
+        Task<IEnumerable<Customer>> GetActiveCustomersAsync(CancellationToken cancellationToken = default);
+        Task<IEnumerable<Customer>> SearchByNameAsync(string searchTerm, CancellationToken cancellationToken = default);
+        Task<bool> ExistsByEmailAsync(Email email, CancellationToken cancellationToken = default);
+        Task<bool> ExistsByPhoneAsync(PhoneNumber phone, CancellationToken cancellationToken = default);
     }
 } 

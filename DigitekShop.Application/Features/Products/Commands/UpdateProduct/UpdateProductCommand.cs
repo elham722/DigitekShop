@@ -1,9 +1,10 @@
 using DigitekShop.Application.DTOs.Product;
 using DigitekShop.Application.Interfaces;
+using DigitekShop.Application.Responses;
 
 namespace DigitekShop.Application.Features.Products.Commands.UpdateProduct
 {
-    public record UpdateProductCommand : ICommand<ProductDto>
+    public record UpdateProductCommand : ICommand<CommandResponse<ProductDto>>
     {
         public int Id { get; init; }
         public string Name { get; init; } = string.Empty;

@@ -2,7 +2,7 @@ using System.Text.Json.Serialization;
 
 namespace DigitekShop.Application.Responses
 {
-    public class CommandResponse<T> : BaseResponse
+    public class CommandResponse<T> : BaseResponse where T : class
     {
         [JsonPropertyName("data")]
         public T? Data { get; set; }

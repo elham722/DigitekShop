@@ -6,13 +6,13 @@ namespace DigitekShop.Domain.Interfaces
 {
     public interface ICategoryRepository : IGenericRepository<Category>
     {
-        Task<Category> GetBySlugAsync(string slug);
-        Task<IEnumerable<Category>> GetMainCategoriesAsync();
-        Task<IEnumerable<Category>> GetSubCategoriesAsync(int parentId);
-        Task<IEnumerable<Category>> GetByTypeAsync(CategoryType type);
-        Task<IEnumerable<Category>> GetHierarchyAsync();
-        Task<bool> ExistsBySlugAsync(string slug);
-        Task<int> GetProductCountAsync(int categoryId);
-        Task<int> GetSubCategoryCountAsync(int categoryId);
+        Task<Category> GetBySlugAsync(string slug, CancellationToken cancellationToken = default);
+        Task<IEnumerable<Category>> GetMainCategoriesAsync(CancellationToken cancellationToken = default);
+        Task<IEnumerable<Category>> GetSubCategoriesAsync(int parentId, CancellationToken cancellationToken = default);
+        Task<IEnumerable<Category>> GetByTypeAsync(CategoryType type, CancellationToken cancellationToken = default);
+        Task<IEnumerable<Category>> GetHierarchyAsync(CancellationToken cancellationToken = default);
+        Task<bool> ExistsBySlugAsync(string slug, CancellationToken cancellationToken = default);
+        Task<int> GetProductCountAsync(int categoryId, CancellationToken cancellationToken = default);
+        Task<int> GetSubCategoryCountAsync(int categoryId, CancellationToken cancellationToken = default);
     }
 } 

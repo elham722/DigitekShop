@@ -32,6 +32,7 @@ namespace DigitekShop.Domain.Entities
         public ICollection<OrderItem> OrderItems { get; private set; }
 
         // Constructor
+
         private Order()
         {
             OrderItems = new List<OrderItem>();

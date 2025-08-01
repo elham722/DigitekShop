@@ -5,11 +5,11 @@ namespace DigitekShop.Domain.Interfaces
 {
     public interface IBrandRepository : IGenericRepository<Brand>
     {
-        Task<Brand> GetBySlugAsync(string slug);
-        Task<IEnumerable<Brand>> GetActiveBrandsAsync();
-        Task<IEnumerable<Brand>> GetByCountryAsync(string country);
-        Task<IEnumerable<Brand>> SearchByNameAsync(string searchTerm);
-        Task<bool> ExistsBySlugAsync(string slug);
-        Task<int> GetProductCountAsync(int brandId);
+        Task<Brand> GetBySlugAsync(string slug, CancellationToken cancellationToken=default);
+        Task<IEnumerable<Brand>> GetActiveBrandsAsync(CancellationToken cancellationToken = default);
+        Task<IEnumerable<Brand>> GetByCountryAsync(string country, CancellationToken cancellationToken = default);
+        Task<IEnumerable<Brand>> SearchByNameAsync(string searchTerm, CancellationToken cancellationToken = default);
+        Task<bool> ExistsBySlugAsync(string slug, CancellationToken cancellationToken = default);
+        Task<int> GetProductCountAsync(int brandId, CancellationToken cancellationToken = default);
     }
 } 

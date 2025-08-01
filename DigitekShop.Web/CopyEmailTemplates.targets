@@ -1,0 +1,9 @@
+<Project>
+  <Target Name="CopyEmailTemplates" AfterTargets="Publish">
+    <ItemGroup>
+      <EmailTemplates Include="..\DigitekShop.Infrastructure\EmailTemplates\**\*.*" />
+    </ItemGroup>
+    <Copy SourceFiles="@(EmailTemplates)" DestinationFolder="$(PublishDir)\EmailTemplates\%(RecursiveDir)" />
+    <Message Text="Copied email templates to $(PublishDir)\EmailTemplates" Importance="high" />
+  </Target>
+</Project>

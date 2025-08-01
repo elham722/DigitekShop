@@ -35,8 +35,7 @@ namespace DigitekShop.Application.Features
             // Register FluentValidation
             services.AddValidatorsFromAssemblyContaining<CreateProductCommandValidator>();
 
-            // Register UnitOfWork (این باید در Infrastructure Layer پیاده‌سازی شود)
-            // services.AddScoped<IUnitOfWork, UnitOfWork>();
+            // UnitOfWork is registered in Infrastructure layer
 
             // Product Commands
             services.AddScoped<ICommandHandler<CreateProductCommand, CommandResponse<ProductDto>>, CreateProductCommandHandler>();
