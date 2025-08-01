@@ -14,7 +14,7 @@ namespace DigitekShop.Persistence
             // Register DbContext
             services.AddDbContext<DigitekShopDBContext>(options =>
                 options.UseSqlServer(
-                    configuration.GetConnectionString("DefaultConnection"),
+                    configuration.GetConnectionString("DigitekDBConnection"),
                     b => b.MigrationsAssembly(typeof(DigitekShopDBContext).Assembly.FullName)
                 ));
             // Register Unit of Work

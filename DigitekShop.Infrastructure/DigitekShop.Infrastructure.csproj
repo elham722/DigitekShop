@@ -16,7 +16,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\DigitekShop.Application\DigitekShop.Application.csproj" />
-    <ProjectReference Include="..\DigitekShop.Persistence\DigitekShop.Persistence.csproj" />
   </ItemGroup>
 
 </Project>
