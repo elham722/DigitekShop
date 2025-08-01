@@ -40,7 +40,7 @@ namespace DigitekShop.Application.Features.Orders.Commands.CreateOrder
 
                 // بررسی فعال بودن مشتری
                 if (!customer.IsActive())
-                    throw new InvalidOperationException("Customer is not active");
+                    throw new CustomerNotActiveException(command.CustomerId, "create order");
 
                 // ایجاد آدرس‌ها
                 var shippingAddress = new Address(

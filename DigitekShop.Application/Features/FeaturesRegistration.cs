@@ -4,6 +4,7 @@ using DigitekShop.Application.DTOs.Common;
 using DigitekShop.Application.DTOs.Customer;
 using DigitekShop.Application.DTOs.Order;
 using DigitekShop.Application.DTOs.Product;
+using DigitekShop.Application.Responses;
 using DigitekShop.Application.Features.Products.Commands.CreateProduct;
 using DigitekShop.Application.Features.Products.Commands.UpdateProduct;
 using DigitekShop.Application.Features.Products.Commands.DeleteProduct;
@@ -15,7 +16,9 @@ using DigitekShop.Application.Features.Orders.Commands.CreateOrder;
 using DigitekShop.Application.Features.Orders.Queries.GetOrders;
 using DigitekShop.Application.Services;
 using DigitekShop.Application.Interfaces;
+using DigitekShop.Application.Validators.Products;
 using DigitekShop.Domain.Interfaces;
+using FluentValidation;
 
 namespace DigitekShop.Application.Features
 {
@@ -26,16 +29,22 @@ namespace DigitekShop.Application.Features
             // Register Mediator
             services.AddScoped<IMediator, Mediator>();
 
+            // Register Validation Service
+            services.AddScoped<IValidationService, ValidationService>();
+
+            // Register FluentValidation
+            services.AddValidatorsFromAssemblyContaining<CreateProductCommandValidator>();
+
             // Register UnitOfWork (این باید در Infrastructure Layer پیاده‌سازی شود)
             // services.AddScoped<IUnitOfWork, UnitOfWork>();
 
             // Product Commands
-            services.AddScoped<ICommandHandler<CreateProductCommand, ProductDto>, CreateProductCommandHandler>();
-            services.AddScoped<ICommandHandler<UpdateProductCommand, ProductDto>, UpdateProductCommandHandler>();
+            services.AddScoped<ICommandHandler<CreateProductCommand, CommandResponse<ProductDto>>, CreateProductCommandHandler>();
+            services.AddScoped<ICommandHandler<UpdateProductCommand, CommandResponse<ProductDto>>, UpdateProductCommandHandler>();
             services.AddScoped<ICommandHandler<DeleteProductCommand>, DeleteProductCommandHandler>();
 
             // Product Queries
-            services.AddScoped<IQueryHandler<GetProductQuery, ProductDto>, GetProductQueryHandler>();
+            services.AddScoped<IQueryHandler<GetProductQuery, SuccessResponse<ProductDto>>, GetProductQueryHandler>();
             services.AddScoped<IQueryHandler<GetProductsQuery, PagedResultDto<ProductListDto>>, GetProductsQueryHandler>();
 
             // Customer Commands

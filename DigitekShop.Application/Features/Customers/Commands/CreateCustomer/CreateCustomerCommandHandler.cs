@@ -4,6 +4,7 @@ using DigitekShop.Application.Profiles;
 using DigitekShop.Domain.Entities;
 using DigitekShop.Domain.Interfaces;
 using DigitekShop.Domain.ValueObjects;
+using DigitekShop.Domain.Exceptions;
 using AutoMapper;
 
 namespace DigitekShop.Application.Features.Customers.Commands.CreateCustomer
@@ -29,12 +30,12 @@ namespace DigitekShop.Application.Features.Customers.Commands.CreateCustomer
                 // بررسی تکراری نبودن ایمیل
                 var existingCustomerByEmail = await _unitOfWork.Customers.GetByEmailAsync(new Email(command.Email));
                 if (existingCustomerByEmail != null)
-                    throw new ArgumentException($"Customer with email {command.Email} already exists");
+                    throw new DuplicateEntityException("Customer", "email", command.Email);
 
                 // بررسی تکراری نبودن شماره تلفن
                 var existingCustomerByPhone = await _unitOfWork.Customers.GetByPhoneAsync(new PhoneNumber(command.Phone));
                 if (existingCustomerByPhone != null)
-                    throw new ArgumentException($"Customer with phone {command.Phone} already exists");
+                    throw new DuplicateEntityException("Customer", "phone", command.Phone);
 
                 // ایجاد Value Objects
                 var email = new Email(command.Email);

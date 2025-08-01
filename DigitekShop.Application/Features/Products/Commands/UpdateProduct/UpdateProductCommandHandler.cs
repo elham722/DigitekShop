@@ -1,6 +1,7 @@
 using DigitekShop.Application.DTOs.Product;
 using DigitekShop.Application.Interfaces;
 using DigitekShop.Application.Profiles;
+using DigitekShop.Application.Responses;
 using DigitekShop.Domain.Entities;
 using DigitekShop.Domain.Interfaces;
 using DigitekShop.Domain.ValueObjects;
@@ -9,7 +10,7 @@ using AutoMapper;
 
 namespace DigitekShop.Application.Features.Products.Commands.UpdateProduct
 {
-    public class UpdateProductCommandHandler : ICommandHandler<UpdateProductCommand, ProductDto>
+    public class UpdateProductCommandHandler : ICommandHandler<UpdateProductCommand, CommandResponse<ProductDto>>
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
@@ -22,7 +23,7 @@ namespace DigitekShop.Application.Features.Products.Commands.UpdateProduct
             _mapper = mapper;
         }
 
-        public async Task<ProductDto> HandleAsync(UpdateProductCommand command, CancellationToken cancellationToken = default)
+        public async Task<CommandResponse<ProductDto>> HandleAsync(UpdateProductCommand command, CancellationToken cancellationToken = default)
         {
             try
             {
@@ -37,14 +38,14 @@ namespace DigitekShop.Application.Features.Products.Commands.UpdateProduct
                 // بررسی وجود دسته‌بندی
                 var category = await _unitOfWork.Categories.GetByIdAsync(command.CategoryId);
                 if (category == null)
-                    throw new ArgumentException($"Category with ID {command.CategoryId} not found");
+                    throw new CategoryNotFoundException(command.CategoryId);
 
                 // بررسی وجود برند (اگر مشخص شده)
                 if (command.BrandId.HasValue)
                 {
                     var brand = await _unitOfWork.Brands.GetByIdAsync(command.BrandId.Value);
                     if (brand == null)
-                        throw new ArgumentException($"Brand with ID {command.BrandId.Value} not found");
+                        throw new BrandNotFoundException(command.BrandId.Value);
                 }
 
                 // به‌روزرسانی اطلاعات محصول
@@ -71,8 +72,13 @@ namespace DigitekShop.Application.Features.Products.Commands.UpdateProduct
                 // تایید تراکنش
                 await _unitOfWork.CommitTransactionAsync(cancellationToken);
 
-                // تبدیل به DTO و بازگشت
-                return _mapper.Map<ProductDto>(product);
+                // تبدیل به DTO و ایجاد Response
+                var productDto = _mapper.Map<ProductDto>(product);
+                return ResponseFactory.CreateCommandWithDataAndId(
+                    productDto, 
+                    product.Id, 
+                    "UpdateProduct", 
+                    "Product updated successfully");
             }
             catch
             {
