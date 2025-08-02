@@ -2,6 +2,8 @@ using DigitekShop.Application;
 using DigitekShop.Application.Features;
 using DigitekShop.Infrastructure;
 using DigitekShop.Persistence;
+using DigitekShop.Api.Extensions;
+using DigitekShop.Api.Middleware;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -10,6 +12,9 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllers();
 // Ensure the ApplicationServicesRegistration method is defined and accessible
 builder.Services.ConfigureAddApplicationServices();
+
+// Add CORS with configuration
+builder.Services.AddCorsWithConfiguration(builder.Configuration);
 builder.Services.AddFeatures();
 builder.Services.AddInfrastructureServices(builder.Configuration);
 builder.Services.AddPersistenceServices(builder.Configuration);
@@ -25,6 +30,15 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+
+// Use CORS with configuration
+app.UseCorsWithConfiguration(app.Environment);
+
+// Add CORS logging in development
+if (app.Environment.IsDevelopment())
+{
+    app.UseCorsLogging();
+}
 
 app.UseAuthorization();
 
