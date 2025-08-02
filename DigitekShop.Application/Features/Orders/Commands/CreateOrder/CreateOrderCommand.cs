@@ -24,6 +24,7 @@ namespace DigitekShop.Application.Features.Orders.Commands.CreateOrder
         public string BillingState { get; init; } = string.Empty;
         public string BillingPostalCode { get; init; } = string.Empty;
         public string BillingCountry { get; init; } = string.Empty;
+
         
         // Order Items
         public List<CreateOrderItemDto> OrderItems { get; init; } = new();
