@@ -26,6 +26,7 @@ namespace DigitekShop.Domain.Entities
         public Category Category { get; private set; }
         public int? BrandId { get; private set; }
         public Brand Brand { get; private set; }
+        public ICollection<Review> Reviews { get; private set; } = new List<Review>();
 
         // Constructor
         private Product() { } // برای EF Core
@@ -138,5 +139,27 @@ namespace DigitekShop.Domain.Entities
         public string GetDisplayName() => Name.Value;
         
         public string GetFullName() => $"{Brand?.Name.Value ?? ""} {Model}".Trim();
+
+        public decimal GetAverageRating()
+        {
+            if (Reviews == null || !Reviews.Any())
+                return 0;
+
+            var approvedReviews = Reviews.Where(r => r.IsApproved).ToList();
+            if (!approvedReviews.Any())
+                return 0;
+
+            return (decimal)Math.Round(approvedReviews.Average(r => r.Rating), 1);
+        }
+
+        public int GetReviewCount()
+        {
+            return Reviews?.Count(r => r.IsApproved) ?? 0;
+        }
+
+        public IEnumerable<Review> GetApprovedReviews()
+        {
+            return Reviews?.Where(r => r.IsApproved).OrderByDescending(r => r.CreatedAt) ?? Enumerable.Empty<Review>();
+        }
     }
 }

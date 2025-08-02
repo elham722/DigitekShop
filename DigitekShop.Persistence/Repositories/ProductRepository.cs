@@ -78,6 +78,7 @@ namespace DigitekShop.Persistence.Repositories
                 .Include(p => p.Category)
                 .Include(p => p.Brand)
                 .Include(p => p.Reviews)
+                    .ThenInclude(r => r.Customer)
                 .FirstOrDefaultAsync(p => p.Id == id, cancellationToken);
         }
 
@@ -110,6 +111,41 @@ namespace DigitekShop.Persistence.Repositories
                 query = query.Where(p => p.Status == status.Value);
 
             return await query.ToListAsync(cancellationToken);
+        }
+
+        public async Task<decimal> GetAverageRatingAsync(int productId, CancellationToken cancellationToken = default)
+        {
+            return (decimal)await _dbSet
+                .Where(p => p.Id == productId && !p.IsDeleted)
+                .SelectMany(p => p.Reviews)
+                .Where(r => r.IsApproved)
+                .AverageAsync(r => r.Rating, cancellationToken);
+        }
+
+        public async Task<int> GetReviewCountAsync(int productId, CancellationToken cancellationToken = default)
+        {
+            return await _dbSet
+                .Where(p => p.Id == productId && !p.IsDeleted)
+                .SelectMany(p => p.Reviews)
+                .CountAsync(r => r.IsApproved, cancellationToken);
+        }
+
+        public async Task<IEnumerable<Product>> GetTopRatedProductsAsync(int count = 10, CancellationToken cancellationToken = default)
+        {
+            return await _dbSet
+                .Include(p => p.Category)
+                .Include(p => p.Brand)
+                .Where(p => !p.IsDeleted && p.Status == ProductStatus.Active)
+                .Select(p => new
+                {
+                    Product = p,
+                    AverageRating = p.Reviews.Where(r => r.IsApproved).Average(r => r.Rating)
+                })
+                .Where(x => x.AverageRating > 0)
+                .OrderByDescending(x => x.AverageRating)
+                .Take(count)
+                .Select(x => x.Product)
+                .ToListAsync(cancellationToken);
         }
     }
 }

@@ -22,5 +22,8 @@ namespace DigitekShop.Domain.Interfaces
             decimal? maxPrice = null,
             ProductStatus? status = null,
             CancellationToken cancellationToken = default);
+        Task<decimal> GetAverageRatingAsync(int productId, CancellationToken cancellationToken = default);
+        Task<int> GetReviewCountAsync(int productId, CancellationToken cancellationToken = default);
+        Task<IEnumerable<Product>> GetTopRatedProductsAsync(int count = 10, CancellationToken cancellationToken = default);
     }
 } 
