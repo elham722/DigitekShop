@@ -4,6 +4,7 @@ using DigitekShop.Infrastructure;
 using DigitekShop.Persistence;
 using DigitekShop.Api.Extensions;
 using DigitekShop.Api.Middleware;
+using DigitekShop.Domain.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -20,6 +21,8 @@ builder.Services.AddInfrastructureServices(builder.Configuration);
 builder.Services.AddPersistenceServices(builder.Configuration);
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
+
+
 
 var app = builder.Build();
 

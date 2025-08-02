@@ -1,8 +1,10 @@
-﻿using System.Reflection;
+﻿using System.ComponentModel;
+using System.Reflection;
 using Microsoft.Extensions.DependencyInjection;
 using AutoMapper;
 using DigitekShop.Application.Profiles;
 using DigitekShop.Application.Features;
+using DigitekShop.Domain.Services;
 
 namespace DigitekShop.Application
 {
@@ -15,6 +17,10 @@ namespace DigitekShop.Application
 
             // Register Features (Commands and Queries)
             services.AddFeatures();
+            services.AddScoped<OrderDomainService>();
+
+            // Fix for CS1503: Use a lambda to configure MediatRServiceConfiguration
+            services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(Assembly.GetExecutingAssembly()));
 
             return services;
         }
