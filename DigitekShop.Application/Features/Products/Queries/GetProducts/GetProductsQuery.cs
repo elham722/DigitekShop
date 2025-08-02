@@ -15,6 +15,7 @@ namespace DigitekShop.Application.Features.Products.Queries.GetProducts
         public decimal? MaxPrice { get; init; }
         public bool? InStockOnly { get; init; }
         public string? SortBy { get; init; } = "Name";
+        public string? SortOrder { get; init; } = "Name";
         public bool IsAscending { get; init; } = true;
     }
 } 

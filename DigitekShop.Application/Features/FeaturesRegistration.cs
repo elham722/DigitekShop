@@ -40,7 +40,8 @@ namespace DigitekShop.Application.Features
             // Product Commands
             services.AddScoped<ICommandHandler<CreateProductCommand, CommandResponse<ProductDto>>, CreateProductCommandHandler>();
             services.AddScoped<ICommandHandler<UpdateProductCommand, CommandResponse<ProductDto>>, UpdateProductCommandHandler>();
-            services.AddScoped<ICommandHandler<DeleteProductCommand>, DeleteProductCommandHandler>();
+            // Update the registration for DeleteProductCommandHandler to include the correct generic type parameters
+            services.AddScoped<ICommandHandler<DeleteProductCommand, CommandResponse>, DeleteProductCommandHandler>();
 
             // Product Queries
             services.AddScoped<IQueryHandler<GetProductQuery, SuccessResponse<ProductDto>>, GetProductQueryHandler>();

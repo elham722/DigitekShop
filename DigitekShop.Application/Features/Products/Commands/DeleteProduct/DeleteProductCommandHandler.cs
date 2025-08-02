@@ -1,4 +1,5 @@
 using DigitekShop.Application.Interfaces;
+using DigitekShop.Application.Responses;
 using DigitekShop.Domain.Interfaces;
 using DigitekShop.Domain.Exceptions;
 using System.Threading;
@@ -6,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace DigitekShop.Application.Features.Products.Commands.DeleteProduct
 {
-    public class DeleteProductCommandHandler : ICommandHandler<DeleteProductCommand>
+    public class DeleteProductCommandHandler : ICommandHandler<DeleteProductCommand, CommandResponse>
     {
         private readonly IUnitOfWork _unitOfWork;
         // private readonly IOrderRepository _orderRepository; // اگر نیاز به چک سفارش فعال دارید
@@ -16,7 +17,7 @@ namespace DigitekShop.Application.Features.Products.Commands.DeleteProduct
             _unitOfWork = unitOfWork;
         }
 
-        public async Task<Unit> HandleAsync(DeleteProductCommand command, CancellationToken cancellationToken = default)
+        public async Task<CommandResponse> HandleAsync(DeleteProductCommand command, CancellationToken cancellationToken = default)
         {
             try
             {
@@ -35,7 +36,7 @@ namespace DigitekShop.Application.Features.Products.Commands.DeleteProduct
                 await _unitOfWork.SaveChangesAsync(cancellationToken);
                 await _unitOfWork.CommitTransactionAsync(cancellationToken);
 
-                return new Unit();
+                return ResponseFactory.CreateCommandSuccess("DeleteProduct", "Product deleted successfully");
             }
             catch
             {

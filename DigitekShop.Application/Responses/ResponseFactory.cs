@@ -19,6 +19,11 @@ namespace DigitekShop.Application.Responses
             return CommandResponse<T>.Create(operation, message);
         }
 
+        public static CommandResponse CreateCommandSuccess(string operation, string message = "Command executed successfully")
+        {
+            return CommandResponse.Create(operation, message);
+        }
+
         public static CommandResponse<T> CreateCommandWithData<T>(T data, string operation, string message = "Command executed successfully") where T : class
         {
             return CommandResponse<T>.CreateWithData(data, operation, message);

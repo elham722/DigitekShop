@@ -1,3 +1,5 @@
+using MediatR;
+
 namespace DigitekShop.Application.Interfaces
 {
     /// <summary>

@@ -1,3 +1,5 @@
+using DigitekShop.Application.Responses;
+
 namespace DigitekShop.Application.Interfaces
 {
     /// <summary>
@@ -11,7 +13,7 @@ namespace DigitekShop.Application.Interfaces
     /// <summary>
     /// Handler for Commands that don't return a result
     /// </summary>
-    public interface ICommandHandler<TCommand> : ICommandHandler<TCommand, Unit> where TCommand : ICommand
+    public interface ICommandHandler<TCommand> : ICommandHandler<TCommand, CommandResponse> where TCommand : ICommand
     {
     }
 
@@ -25,12 +27,7 @@ namespace DigitekShop.Application.Interfaces
     /// <summary>
     /// Base interface for Commands that don't return a result
     /// </summary>
-    public interface ICommand : ICommand<Unit>
+    public interface ICommand : ICommand<CommandResponse>
     {
     }
-
-    /// <summary>
-    /// Represents a void result
-    /// </summary>
-    public record Unit;
 } 

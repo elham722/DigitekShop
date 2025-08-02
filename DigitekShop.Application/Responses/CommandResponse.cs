@@ -2,6 +2,26 @@ using System.Text.Json.Serialization;
 
 namespace DigitekShop.Application.Responses
 {
+    public class CommandResponse : BaseResponse
+    {
+        [JsonPropertyName("operation")]
+        public string Operation { get; set; } = string.Empty;
+
+        [JsonPropertyName("affectedRows")]
+        public int? AffectedRows { get; set; }
+
+        public CommandResponse(string operation, string message = "Command executed successfully") 
+            : base(true, message)
+        {
+            Operation = operation;
+        }
+
+        public static CommandResponse Create(string operation, string message = "Command executed successfully")
+        {
+            return new CommandResponse(operation, message);
+        }
+    }
+
     public class CommandResponse<T> : BaseResponse where T : class
     {
         [JsonPropertyName("data")]

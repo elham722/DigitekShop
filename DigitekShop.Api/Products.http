@@ -1,0 +1,211 @@
+@baseUrl = https://localhost:7001
+@contentType = application/json
+
+### ========================================
+### PRODUCTS API TESTS
+### ========================================
+
+### 1. Get All Products (Paginated)
+GET {{baseUrl}}/api/products?pageNumber=1&pageSize=10
+Content-Type: {{contentType}}
+
+### 2. Get Product by ID
+GET {{baseUrl}}/api/products/1
+Content-Type: {{contentType}}
+
+### 3. Create New Product
+POST {{baseUrl}}/api/products
+Content-Type: {{contentType}}
+
+{
+  "name": "لپ‌تاپ اپل مک‌بوک پرو",
+  "sku": "MBP-2024-001",
+  "description": "لپ‌تاپ قدرتمند اپل با پردازنده M3 Pro",
+  "price": 85000000,
+  "currency": "IRR",
+  "stockQuantity": 10,
+  "categoryId": 1,
+  "brandId": 1,
+  "status": 1
+}
+
+### 4. Update Product
+PUT {{baseUrl}}/api/products/1
+Content-Type: {{contentType}}
+
+{
+  "id": 1,
+  "name": "لپ‌تاپ اپل مک‌بوک پرو (به‌روزرسانی شده)",
+  "sku": "MBP-2024-001",
+  "description": "لپ‌تاپ قدرتمند اپل با پردازنده M3 Pro - نسخه به‌روزرسانی شده",
+  "price": 90000000,
+  "currency": "IRR",
+  "stockQuantity": 15,
+  "categoryId": 1,
+  "brandId": 1,
+  "status": 1
+}
+
+### 5. Delete Product
+DELETE {{baseUrl}}/api/products/1
+Content-Type: {{contentType}}
+
+### 6. Get Products by Category
+GET {{baseUrl}}/api/products/category/1?pageNumber=1&pageSize=10
+Content-Type: {{contentType}}
+
+### 7. Search Products
+GET {{baseUrl}}/api/products/search?searchTerm=لپ‌تاپ&pageNumber=1&pageSize=10
+Content-Type: {{contentType}}
+
+### 8. Get Top Selling Products
+GET {{baseUrl}}/api/products/top-selling?count=5
+Content-Type: {{contentType}}
+
+### 9. Get New Arrivals
+GET {{baseUrl}}/api/products/new-arrivals?count=5
+Content-Type: {{contentType}}
+
+### ========================================
+### FILTERING AND SORTING TESTS
+### ========================================
+
+### 10. Get Products with Brand Filter
+GET {{baseUrl}}/api/products?brandId=1&pageNumber=1&pageSize=10
+Content-Type: {{contentType}}
+
+### 11. Get Products with Price Range
+GET {{baseUrl}}/api/products?minPrice=50000000&maxPrice=100000000&pageNumber=1&pageSize=10
+Content-Type: {{contentType}}
+
+### 12. Get Products with Status Filter
+GET {{baseUrl}}/api/products?status=1&pageNumber=1&pageSize=10
+Content-Type: {{contentType}}
+
+### 13. Get Products Sorted by Price (Ascending)
+GET {{baseUrl}}/api/products?sortBy=Price&sortOrder=Ascending&pageNumber=1&pageSize=10
+Content-Type: {{contentType}}
+
+### 14. Get Products Sorted by Price (Descending)
+GET {{baseUrl}}/api/products?sortBy=Price&sortOrder=Descending&pageNumber=1&pageSize=10
+Content-Type: {{contentType}}
+
+### 15. Get Products Sorted by Name
+GET {{baseUrl}}/api/products?sortBy=Name&sortOrder=Ascending&pageNumber=1&pageSize=10
+Content-Type: {{contentType}}
+
+### ========================================
+### ERROR HANDLING TESTS
+### ========================================
+
+### 16. Get Non-existent Product
+GET {{baseUrl}}/api/products/999
+Content-Type: {{contentType}}
+
+### 17. Create Product with Invalid Data
+POST {{baseUrl}}/api/products
+Content-Type: {{contentType}}
+
+{
+  "name": "",
+  "sku": "",
+  "price": -1000,
+  "stockQuantity": -5
+}
+
+### 18. Update Product with Mismatched ID
+PUT {{baseUrl}}/api/products/1
+Content-Type: {{contentType}}
+
+{
+  "id": 2,
+  "name": "محصول اشتباه"
+}
+
+### 19. Search with Empty Term
+GET {{baseUrl}}/api/products/search?searchTerm=
+Content-Type: {{contentType}}
+
+### 20. Delete Non-existent Product
+DELETE {{baseUrl}}/api/products/999
+Content-Type: {{contentType}}
+
+### ========================================
+### BULK OPERATIONS (Future Enhancement)
+### ========================================
+
+### 21. Create Multiple Products (Future)
+POST {{baseUrl}}/api/products/bulk
+Content-Type: {{contentType}}
+
+[
+  {
+    "name": "لپ‌تاپ دل XPS 13",
+    "sku": "DELL-XPS-001",
+    "description": "لپ‌تاپ فوق‌العاده نازک و سبک",
+    "price": 75000000,
+    "currency": "IRR",
+    "stockQuantity": 8,
+    "categoryId": 1,
+    "brandId": 2,
+    "status": 1
+  },
+  {
+    "name": "لپ‌تاپ ایسوس ROG",
+    "sku": "ASUS-ROG-001",
+    "description": "لپ‌تاپ گیمینگ قدرتمند",
+    "price": 95000000,
+    "currency": "IRR",
+    "stockQuantity": 5,
+    "categoryId": 1,
+    "brandId": 3,
+    "status": 1
+  }
+]
+
+### ========================================
+### PERFORMANCE TESTS
+### ========================================
+
+### 22. Large Page Size Test
+GET {{baseUrl}}/api/products?pageSize=100
+Content-Type: {{contentType}}
+
+### 23. Complex Filter Test
+GET {{baseUrl}}/api/products?categoryId=1&brandId=1&minPrice=50000000&maxPrice=100000000&status=1&sortBy=Price&sortOrder=Descending&pageNumber=1&pageSize=20
+Content-Type: {{contentType}}
+
+### ========================================
+### RESPONSE HEADERS TEST
+### ========================================
+
+### 24. Check Response Headers
+GET {{baseUrl}}/api/products
+Content-Type: {{contentType}}
+
+### ========================================
+### CORS TEST (From Different Origin)
+### ========================================
+
+### 25. Test CORS Headers
+OPTIONS {{baseUrl}}/api/products
+Origin: https://digitekshop.com
+Access-Control-Request-Method: GET
+Access-Control-Request-Headers: Content-Type
+
+### ========================================
+### NOTES
+### ========================================
+
+# این فایل برای تست API محصولات استفاده می‌شود
+# قبل از استفاده، مطمئن شوید که:
+# 1. سرور API در حال اجرا است
+# 2. دیتابیس ایجاد شده و migration ها اعمال شده‌اند
+# 3. داده‌های اولیه (Categories, Brands) در دیتابیس موجود هستند
+
+# برای تست کامل:
+# 1. ابتدا Categories و Brands را ایجاد کنید
+# 2. سپس محصولات را تست کنید
+# 3. عملیات CRUD را به ترتیب انجام دهید
+# 4. فیلترها و جستجو را تست کنید
+# 5. خطاها را بررسی کنید 
