@@ -28,15 +28,13 @@ namespace DigitekShop.Persistence.Repositories
             return entities;
         }
 
-        public virtual Task DeleteAsync(int id, CancellationToken cancellationToken = default)
+        public virtual async Task DeleteAsync(int id, CancellationToken cancellationToken = default)
         {
-            var entity = _dbSet.Local.FirstOrDefault(e => e.Id == id);
-            if (entity == null)
+            var entity = await _dbSet.FindAsync(id, cancellationToken);
+            if (entity != null)
             {
-                entity = _dbSet.Attach(entity).Entity;
+                _dbSet.Remove(entity);
             }
-            _dbSet.Remove(entity);
-            return Task.CompletedTask;
         }
 
         public virtual Task DeleteAsync(T entity, CancellationToken cancellationToken = default)
@@ -81,9 +79,47 @@ namespace DigitekShop.Persistence.Repositories
             return await _dbSet.ToListAsync(cancellationToken);
         }
 
+        public virtual async Task<(IEnumerable<T> Items, int TotalCount)> GetPagedAsync(
+            int pageNumber, 
+            int pageSize, 
+            CancellationToken cancellationToken = default)
+        {
+            var totalCount = await _dbSet.CountAsync(cancellationToken);
+            var items = await _dbSet
+                .Skip((pageNumber - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync(cancellationToken);
+
+            return (items, totalCount);
+        }
+
+        public virtual async Task<(IEnumerable<T> Items, int TotalCount)> GetActivePagedAsync(
+            int pageNumber, 
+            int pageSize, 
+            CancellationToken cancellationToken = default)
+        {
+            var totalCount = await _dbSet.CountAsync(e => !e.IsDeleted, cancellationToken);
+            var items = await _dbSet
+                .Where(e => !e.IsDeleted)
+                .Skip((pageNumber - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync(cancellationToken);
+
+            return (items, totalCount);
+        }
+
         public virtual async Task<T> GetByIdAsync(int id, CancellationToken cancellationToken = default)
         {
             return await _dbSet.FirstOrDefaultAsync(e => e.Id == id, cancellationToken);
+        }
+
+        public virtual async Task<T> GetByIdWithIncludesAsync(int id, CancellationToken cancellationToken = default)
+        {
+            var query = _dbSet.AsQueryable();
+            
+            // اینجا می‌توانیم navigation properties را include کنیم
+            // این متد باید در کلاس‌های فرزند override شود
+            return await query.FirstOrDefaultAsync(e => e.Id == id, cancellationToken);
         }
 
         public virtual async Task<int> GetTotalCountAsync()
@@ -91,17 +127,15 @@ namespace DigitekShop.Persistence.Repositories
             return await _dbSet.CountAsync();
         }
 
-        public virtual Task RestoreAsync(int id, CancellationToken cancellationToken = default)
+        public virtual async Task RestoreAsync(int id, CancellationToken cancellationToken = default)
         {
-            var entity = _dbSet.Local.FirstOrDefault(e => e.Id == id);
-            if (entity == null)
+            var entity = await _dbSet.FindAsync(id, cancellationToken);
+            if (entity != null)
             {
-                entity = _dbSet.Attach(entity).Entity;
+                entity.IsDeleted = false;
+                entity.UpdatedAt = DateTime.UtcNow;
+                _context.Entry(entity).State = EntityState.Modified;
             }
-            entity.IsDeleted = false;
-            entity.UpdatedAt = DateTime.UtcNow;
-            _context.Entry(entity).State = EntityState.Modified;
-            return Task.CompletedTask;
         }
 
         public virtual Task RestoreAsync(T entity, CancellationToken cancellationToken = default)
@@ -112,17 +146,15 @@ namespace DigitekShop.Persistence.Repositories
             return Task.CompletedTask;
         }
 
-       public virtual Task SoftDeleteAsync(int id, CancellationToken cancellationToken = default)
+       public virtual async Task SoftDeleteAsync(int id, CancellationToken cancellationToken = default)
     {
-        var entity = _dbSet.Local.FirstOrDefault(e => e.Id == id);
-        if (entity == null)
+        var entity = await _dbSet.FindAsync(id, cancellationToken);
+        if (entity != null)
         {
-            entity = _dbSet.Attach(entity).Entity;
+            entity.IsDeleted = true;
+            entity.UpdatedAt = DateTime.UtcNow;
+            _context.Entry(entity).State = EntityState.Modified;
         }
-        entity.IsDeleted = true;
-        entity.UpdatedAt = DateTime.UtcNow;
-        _context.Entry(entity).State = EntityState.Modified;
-        return Task.CompletedTask;
     }
 
         public virtual Task SoftDeleteAsync(T entity, CancellationToken cancellationToken = default)

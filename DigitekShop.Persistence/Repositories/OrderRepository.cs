@@ -49,6 +49,9 @@ namespace DigitekShop.Persistence.Repositories
         public async Task<IEnumerable<Order>> GetByStatusAsync(OrderStatus status, CancellationToken cancellationToken = default)
         {
             return await _dbSet
+                .Include(o => o.Customer)
+                .Include(o => o.OrderItems)
+                    .ThenInclude(oi => oi.Product)
                 .Where(o => o.Status == status && !o.IsDeleted)
                 .OrderByDescending(o => o.CreatedAt)
                 .ToListAsync(cancellationToken);
@@ -92,6 +95,15 @@ namespace DigitekShop.Persistence.Repositories
             query = query.Where(o => !o.IsDeleted && o.Status == OrderStatus.Delivered);
 
             return await query.SumAsync(o => o.FinalAmount.Amount, cancellationToken);
+        }
+
+        public override async Task<Order> GetByIdWithIncludesAsync(int id, CancellationToken cancellationToken = default)
+        {
+            return await _dbSet
+                .Include(o => o.Customer)
+                .Include(o => o.OrderItems)
+                    .ThenInclude(oi => oi.Product)
+                .FirstOrDefaultAsync(o => o.Id == id, cancellationToken);
         }
     }
 }

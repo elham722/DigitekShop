@@ -85,6 +85,98 @@ namespace DigitekShop.Persistence.UnitOfWork
             }
         }
 
+        public bool HasActiveTransaction => _currentTransaction != null;
+
+        public string? GetCurrentTransactionId()
+        {
+            return _currentTransaction?.TransactionId.ToString();
+        }
+
+        public bool HasChanges()
+        {
+            return _context.ChangeTracker.HasChanges();
+        }
+
+        public async Task<bool> HasChangesAsync(CancellationToken cancellationToken = default)
+        {
+            return await Task.FromResult(_context.ChangeTracker.HasChanges());
+        }
+
+        public async Task ResetContextAsync(CancellationToken cancellationToken = default)
+        {
+            // Detach all entities
+            DetachAllEntities();
+            
+            // Reset the context state
+            _context.ChangeTracker.Clear();
+            
+            await Task.CompletedTask;
+        }
+
+        public void DetachAllEntities()
+        {
+            var changedEntriesCopy = _context.ChangeTracker.Entries()
+                .Where(e => e.State == EntityState.Added ||
+                           e.State == EntityState.Modified ||
+                           e.State == EntityState.Deleted)
+                .ToList();
+
+            foreach (var entry in changedEntriesCopy)
+            {
+                entry.State = EntityState.Detached;
+            }
+        }
+
+        public async Task<TResult> ExecuteInTransactionAsync<TResult>(
+            Func<Task<TResult>> operation,
+            CancellationToken cancellationToken = default)
+        {
+            if (HasActiveTransaction)
+            {
+                // اگر تراکنش فعال است، عملیات را مستقیماً اجرا کن
+                return await operation();
+            }
+
+            await BeginTransactionAsync(cancellationToken);
+            try
+            {
+                var result = await operation();
+                await SaveChangesAsync(cancellationToken);
+                await CommitTransactionAsync(cancellationToken);
+                return result;
+            }
+            catch
+            {
+                await RollbackTransactionAsync(cancellationToken);
+                throw;
+            }
+        }
+
+        public async Task ExecuteInTransactionAsync(
+            Func<Task> operation,
+            CancellationToken cancellationToken = default)
+        {
+            if (HasActiveTransaction)
+            {
+                // اگر تراکنش فعال است، عملیات را مستقیماً اجرا کن
+                await operation();
+                return;
+            }
+
+            await BeginTransactionAsync(cancellationToken);
+            try
+            {
+                await operation();
+                await SaveChangesAsync(cancellationToken);
+                await CommitTransactionAsync(cancellationToken);
+            }
+            catch
+            {
+                await RollbackTransactionAsync(cancellationToken);
+                throw;
+            }
+        }
+
         public void Dispose()
         {
             _context?.Dispose();

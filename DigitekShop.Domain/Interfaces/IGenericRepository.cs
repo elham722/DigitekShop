@@ -6,8 +6,11 @@ namespace DigitekShop.Domain.Interfaces
     {
         // Read Operations
         Task<T> GetByIdAsync(int id, CancellationToken cancellationToken = default);
+        Task<T> GetByIdWithIncludesAsync(int id, CancellationToken cancellationToken = default);
         Task<IEnumerable<T>> GetAllAsync(CancellationToken cancellationToken = default);
         Task<IEnumerable<T>> GetActiveAsync(CancellationToken cancellationToken = default);
+        Task<(IEnumerable<T> Items, int TotalCount)> GetPagedAsync(int pageNumber, int pageSize, CancellationToken cancellationToken = default);
+        Task<(IEnumerable<T> Items, int TotalCount)> GetActivePagedAsync(int pageNumber, int pageSize, CancellationToken cancellationToken = default);
         
         // Create Operations
         Task<T> AddAsync(T entity, CancellationToken cancellationToken = default);
