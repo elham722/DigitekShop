@@ -27,6 +27,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DigitekShop.Api", "DigitekS
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DigitekShop.Tests", "DigitekShop.Tests\DigitekShop.Tests.csproj", "{A641527F-7CA0-4D31-AF83-F8C9D33A0945}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DigitekShop.MVC", "DigitekShop.MVC\DigitekShop.MVC.csproj", "{5DF69E05-FC7C-4234-8785-F231E177E3D7}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -57,6 +59,10 @@ Global
 		{A641527F-7CA0-4D31-AF83-F8C9D33A0945}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A641527F-7CA0-4D31-AF83-F8C9D33A0945}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A641527F-7CA0-4D31-AF83-F8C9D33A0945}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5DF69E05-FC7C-4234-8785-F231E177E3D7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5DF69E05-FC7C-4234-8785-F231E177E3D7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5DF69E05-FC7C-4234-8785-F231E177E3D7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5DF69E05-FC7C-4234-8785-F231E177E3D7}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -72,6 +78,7 @@ Global
 		{7BFC04C6-9153-44DB-9D3B-D007CB33F57B} = {F1F96CA4-FD2A-459F-AF6A-9407EE30C7BB}
 		{59F40FB6-9D81-4ECC-AD54-FEC2195ECC1D} = {386FACD2-26D6-4664-9FC9-1ED63A37AC6B}
 		{A641527F-7CA0-4D31-AF83-F8C9D33A0945} = {CD3B150D-E5BB-4F02-9C74-CC81B7236CC7}
+		{5DF69E05-FC7C-4234-8785-F231E177E3D7} = {91359F8E-5579-44A4-9545-69BA5CE379D2}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {9E017F2B-36A0-4104-86EC-D52ECAB7B24F}
