@@ -1,19 +1,20 @@
-using DigitekShop.MVC.Models;
-using DigitekShop.MVC.Services;
 using Microsoft.AspNetCore.Mvc;
+using DigitekShop.Infrastructure.ExternalServices;
+using DigitekShop.Application.DTOs.Product;
 using System.Diagnostics;
+using DigitekShop.MVC.Models;
 
 namespace DigitekShop.MVC.Controllers
 {
     public class HomeController : Controller
     {
         private readonly ILogger<HomeController> _logger;
-        private readonly IProductService _productService;
+        private readonly IExternalService _externalService;
 
-        public HomeController(ILogger<HomeController> logger, IProductService productService)
+        public HomeController(ILogger<HomeController> logger, IExternalService externalService)
         {
             _logger = logger;
-            _productService = productService;
+            _externalService = externalService;
         }
 
         public async Task<IActionResult> Index()
@@ -21,7 +22,7 @@ namespace DigitekShop.MVC.Controllers
             try
             {
                 // Get some featured products for the home page
-                var featuredProducts = await _productService.GetTopSellingProductsAsync(6);
+                var featuredProducts = await _externalService.GetAsync<List<ProductDto>>("api/products/top-selling?count=6");
                 ViewBag.FeaturedProducts = featuredProducts;
                 
                 return View();
@@ -29,7 +30,7 @@ namespace DigitekShop.MVC.Controllers
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error occurred while loading home page");
-                ViewBag.FeaturedProducts = new List<ProductViewModel>();
+                ViewBag.FeaturedProducts = new List<ProductDto>();
                 return View();
             }
         }

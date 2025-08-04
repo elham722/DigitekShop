@@ -11,6 +11,7 @@ using DigitekShop.Application.Responses;
 using DigitekShop.Api.Attributes;
 using DigitekShop.Application.Exceptions;
 using DigitekShop.Domain.Exceptions;
+using DigitekShop.Application.Extensions;
 
 namespace DigitekShop.Api.Controllers
 {
@@ -19,14 +20,15 @@ namespace DigitekShop.Api.Controllers
     [CorsPolicy]
     public class ProductsController : ControllerBase
     {
-        private readonly IMediator _mediator;
         private readonly ILogger<ProductsController> _logger;
 
-        public ProductsController(IMediator mediator, ILogger<ProductsController> logger)
+        public ProductsController(ILogger<ProductsController> logger)
         {
-            _mediator = mediator;
             _logger = logger;
         }
+
+        private IQueryDispatcher QueryDispatcher => HttpContext.QueryDispatcher();
+        private ICommandDispatcher CommandDispatcher => HttpContext.CommandDispatcher();
 
         /// <summary>
         /// دریافت لیست محصولات با قابلیت فیلتر و صفحه‌بندی
@@ -43,7 +45,7 @@ namespace DigitekShop.Api.Controllers
             {
                 _logger.LogInformation("Getting products with filters: {@Filters}", query);
                 
-                var result = await _mediator.Send(query);
+                var result = await QueryDispatcher.DispatchAsync(query);
                 
                 _logger.LogInformation("Retrieved {Count} products", result.Items?.Count() ?? 0);
                 
@@ -72,7 +74,7 @@ namespace DigitekShop.Api.Controllers
                 _logger.LogInformation("Getting product with ID: {ProductId}", id);
                 
                 var query = new GetProductQuery { Id = id };
-                var result = await _mediator.Send(query);
+                var result = await QueryDispatcher.DispatchAsync(query);
                 
                 if (result == null || result.Data == null)
                 {
@@ -110,7 +112,7 @@ namespace DigitekShop.Api.Controllers
             {
                 _logger.LogInformation("Creating new product: {@ProductData}", command);
                 
-                var result = await _mediator.Send(command);
+                var result = await CommandDispatcher.DispatchAsync(command);
                 
                 if (result == null || result.Data == null)
                 {
@@ -172,7 +174,7 @@ namespace DigitekShop.Api.Controllers
                 
                 _logger.LogInformation("Updating product with ID: {ProductId}", id);
                 
-                var result = await _mediator.Send(command);
+                var result = await CommandDispatcher.DispatchAsync(command);
                 
                 if (result == null || result.Data == null)
                 {
@@ -211,7 +213,7 @@ namespace DigitekShop.Api.Controllers
         /// <param name="id">شناسه محصول</param>
         /// <returns>نتیجه حذف</returns>
         [HttpDelete("{id:int}")]
-        [ProducesResponseType(typeof(SuccessResponse<object>), 200)] // Added <object> to resolve CS0305
+        [ProducesResponseType(typeof(SuccessResponse<object>), 200)]
         [ProducesResponseType(typeof(ErrorResponse), 404)]
         [ProducesResponseType(typeof(ErrorResponse), 500)]
         public async Task<IActionResult> DeleteProduct(int id)
@@ -221,10 +223,10 @@ namespace DigitekShop.Api.Controllers
                 _logger.LogInformation("Deleting product with ID: {ProductId}", id);
 
                 var command = new DeleteProductCommand { Id = id };
-                await _mediator.Send(command); // Fixed CS0815 by removing assignment to a variable
+                await CommandDispatcher.DispatchAsync(command);
 
                 _logger.LogInformation("Product deleted successfully with ID: {ProductId}", id);
-                return Ok(new SuccessResponse<object>("محصول با موفقیت حذف شد")); // Added <object> to resolve CS0305
+                return Ok(new SuccessResponse<object>("محصول با موفقیت حذف شد"));
             }
             catch (ProductNotFoundException ex)
             {
@@ -262,7 +264,7 @@ namespace DigitekShop.Api.Controllers
                     PageSize = pageSize
                 };
                 
-                var result = await _mediator.Send(query);
+                var result = await QueryDispatcher.DispatchAsync(query);
                 
                 _logger.LogInformation("Retrieved {Count} products for category {CategoryId}", 
                     result.Items?.Count() ?? 0, categoryId);
@@ -306,7 +308,7 @@ namespace DigitekShop.Api.Controllers
                     PageSize = pageSize
                 };
                 
-                var result = await _mediator.Send(query);
+                var result = await QueryDispatcher.DispatchAsync(query);
                 
                 _logger.LogInformation("Found {Count} products for search term '{SearchTerm}'", 
                     result.Items?.Count() ?? 0, searchTerm);
@@ -341,7 +343,7 @@ namespace DigitekShop.Api.Controllers
                     SortOrder = "Descending"
                 };
                 
-                var result = await _mediator.Send(query);
+                var result = await QueryDispatcher.DispatchAsync(query);
                 
                 _logger.LogInformation("Retrieved {Count} top selling products", result.Items?.Count() ?? 0);
                 
@@ -375,7 +377,7 @@ namespace DigitekShop.Api.Controllers
                     SortOrder = "Descending"
                 };
                 
-                var result = await _mediator.Send(query);
+                var result = await QueryDispatcher.DispatchAsync(query);
                 
                 _logger.LogInformation("Retrieved {Count} new arrival products", result.Items?.Count() ?? 0);
                 

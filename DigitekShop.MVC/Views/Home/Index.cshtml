@@ -1,6 +1,6 @@
 ﻿@{
     ViewData["Title"] = "دیجی‌تک شاپ - فروشگاه آنلاین";
-    var featuredProducts = ViewBag.FeaturedProducts as List<DigitekShop.MVC.Models.ProductViewModel> ?? new List<DigitekShop.MVC.Models.ProductViewModel>();
+    var featuredProducts = ViewBag.FeaturedProducts as List<DigitekShop.Application.DTOs.Product.ProductDto> ?? new List<DigitekShop.Application.DTOs.Product.ProductDto>();
 }
 
 <div class="container mt-4">
@@ -43,7 +43,7 @@
                                 
                                 <div class="card-body d-flex flex-column">
                                     <h6 class="card-title">@product.Name</h6>
-                                    <p class="text-primary fw-bold mb-2">@product.Price.ToString("N0") @product.Currency</p>
+                                    <p class="text-primary fw-bold mb-2">@product.Price.ToString("N0") تومان</p>
                                     
                                     <div class="mt-auto">
                                         <a asp-controller="Products" asp-action="Details" asp-route-id="@product.Id" class="btn btn-outline-primary btn-sm w-100">
@@ -76,7 +76,7 @@
                             <i class="fas fa-mobile-alt text-primary" style="font-size: 2rem;"></i>
                             <h5 class="card-title mt-3">گوشی موبایل</h5>
                             <p class="card-text">بهترین گوشی‌های هوشمند</p>
-                            <a asp-controller="Products" asp-action="Category" asp-route-categoryId="1" class="btn btn-outline-primary">مشاهده</a>
+                            <a asp-controller="Products" asp-action="Index" class="btn btn-outline-primary">مشاهده</a>
                         </div>
                     </div>
                 </div>
@@ -86,7 +86,7 @@
                             <i class="fas fa-laptop text-success" style="font-size: 2rem;"></i>
                             <h5 class="card-title mt-3">لپ تاپ</h5>
                             <p class="card-text">لپ تاپ‌های قدرتمند</p>
-                            <a asp-controller="Products" asp-action="Category" asp-route-categoryId="2" class="btn btn-outline-success">مشاهده</a>
+                            <a asp-controller="Products" asp-action="Index" class="btn btn-outline-success">مشاهده</a>
                         </div>
                     </div>
                 </div>
@@ -96,17 +96,17 @@
                             <i class="fas fa-headphones text-info" style="font-size: 2rem;"></i>
                             <h5 class="card-title mt-3">لوازم جانبی</h5>
                             <p class="card-text">بهترین لوازم جانبی</p>
-                            <a asp-controller="Products" asp-action="Category" asp-route-categoryId="3" class="btn btn-outline-info">مشاهده</a>
+                            <a asp-controller="Products" asp-action="Index" class="btn btn-outline-info">مشاهده</a>
                         </div>
                     </div>
                 </div>
                 <div class="col-md-3 mb-3">
                     <div class="card text-center h-100">
                         <div class="card-body">
-                            <i class="fas fa-fire text-warning" style="font-size: 2rem;"></i>
-                            <h5 class="card-title mt-3">پرفروش‌ترین</h5>
-                            <p class="card-text">محصولات محبوب</p>
-                            <a asp-controller="Products" asp-action="TopSelling" class="btn btn-outline-warning">مشاهده</a>
+                            <i class="fas fa-tablet-alt text-warning" style="font-size: 2rem;"></i>
+                            <h5 class="card-title mt-3">تبلت</h5>
+                            <p class="card-text">تبلت‌های مدرن</p>
+                            <a asp-controller="Products" asp-action="Index" class="btn btn-outline-warning">مشاهده</a>
                         </div>
                     </div>
                 </div>
@@ -119,20 +119,26 @@
         <div class="col-12">
             <h2 class="text-center mb-4">چرا دیجی‌تک شاپ؟</h2>
             <div class="row">
-                <div class="col-md-4 text-center mb-4">
-                    <i class="fas fa-shipping-fast text-primary" style="font-size: 3rem;"></i>
-                    <h5 class="mt-3">ارسال سریع</h5>
-                    <p class="text-muted">ارسال در کمترین زمان ممکن</p>
+                <div class="col-md-4 mb-3">
+                    <div class="text-center">
+                        <i class="fas fa-shipping-fast text-primary" style="font-size: 3rem;"></i>
+                        <h5 class="mt-3">ارسال سریع</h5>
+                        <p>ارسال رایگان برای خریدهای بالای 500 هزار تومان</p>
+                    </div>
                 </div>
-                <div class="col-md-4 text-center mb-4">
-                    <i class="fas fa-shield-alt text-success" style="font-size: 3rem;"></i>
-                    <h5 class="mt-3">ضمانت اصالت</h5>
-                    <p class="text-muted">تمام محصولات اصل و دارای گارانتی</p>
+                <div class="col-md-4 mb-3">
+                    <div class="text-center">
+                        <i class="fas fa-shield-alt text-success" style="font-size: 3rem;"></i>
+                        <h5 class="mt-3">ضمانت اصالت</h5>
+                        <p>تمام محصولات با ضمانت اصالت و گارانتی معتبر</p>
+                    </div>
                 </div>
-                <div class="col-md-4 text-center mb-4">
-                    <i class="fas fa-headset text-info" style="font-size: 3rem;"></i>
-                    <h5 class="mt-3">پشتیبانی 24/7</h5>
-                    <p class="text-muted">پشتیبانی شبانه‌روزی</p>
+                <div class="col-md-4 mb-3">
+                    <div class="text-center">
+                        <i class="fas fa-headset text-info" style="font-size: 3rem;"></i>
+                        <h5 class="mt-3">پشتیبانی 24/7</h5>
+                        <p>پشتیبانی شبانه‌روزی در تمام روزهای هفته</p>
+                    </div>
                 </div>
             </div>
         </div>

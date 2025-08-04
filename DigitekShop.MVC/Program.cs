@@ -1,4 +1,4 @@
-using DigitekShop.MVC.Services;
+
 using DigitekShop.Infrastructure;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -12,8 +12,7 @@ builder.Services.AddInfrastructureServices(builder.Configuration);
 // Add HTTP Client
 builder.Services.AddHttpClient();
 
-// Add Product Service
-builder.Services.AddScoped<IProductService, ProductService>();
+
 
 var app = builder.Build();
 

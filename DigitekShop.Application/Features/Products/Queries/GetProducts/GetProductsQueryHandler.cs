@@ -1,14 +1,14 @@
 using DigitekShop.Application.DTOs.Common;
 using DigitekShop.Application.DTOs.Product;
-using DigitekShop.Application.Interfaces;
 using DigitekShop.Domain.Interfaces;
-using DigitekShop.Domain.Specifications;
+using DigitekShop.Domain.Enums;
 using AutoMapper;
 using System.Linq;
+using MediatR;
 
 namespace DigitekShop.Application.Features.Products.Queries.GetProducts
 {
-    public class GetProductsQueryHandler : IQueryHandler<GetProductsQuery, PagedResultDto<ProductListDto>>
+    public class GetProductsQueryHandler : MediatR.IRequestHandler<GetProductsQuery, PagedResultDto<ProductListDto>>
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
@@ -19,10 +19,10 @@ namespace DigitekShop.Application.Features.Products.Queries.GetProducts
             _mapper = mapper;
         }
 
-        public async Task<PagedResultDto<ProductListDto>> HandleAsync(GetProductsQuery query, CancellationToken cancellationToken = default)
+        public async Task<PagedResultDto<ProductListDto>> Handle(GetProductsQuery query, CancellationToken cancellationToken)
         {
             // دریافت همه محصولات فعال
-            var allProducts = await _unitOfWork.Products.GetActiveAsync();
+            var allProducts = await _unitOfWork.Products.GetByStatusAsync(ProductStatus.Active);
             
             // اعمال فیلترها
             var filteredProducts = allProducts.AsQueryable();

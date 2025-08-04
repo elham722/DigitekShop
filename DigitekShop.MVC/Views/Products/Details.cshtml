@@ -1,4 +1,4 @@
-@model DigitekShop.MVC.Models.ProductViewModel
+
 @{
     ViewData["Title"] = Model.Name;
 }
@@ -36,7 +36,7 @@
                     <h2 class="card-title">@Model.Name</h2>
                     
                     <!-- Rating -->
-                    @if (Model.AverageRating > 0)
+                  @*   @if (Model.AverageRating > 0)
                     {
                         <div class="mb-3">
                             <div class="text-warning">
@@ -58,7 +58,7 @@
                                 <span class="text-muted ms-2">@Model.AverageRating.ToString("F1") از 5 (@Model.ReviewCount نظر)</span>
                             </div>
                         </div>
-                    }
+                    } *@
 
                     <!-- Price -->
                     <div class="mb-3">

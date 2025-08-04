@@ -1,31 +1,35 @@
-using DigitekShop.MVC.Models;
-using DigitekShop.MVC.Services;
 using Microsoft.AspNetCore.Mvc;
+using DigitekShop.Infrastructure.ExternalServices;
+using DigitekShop.Application.DTOs.Product;
+using DigitekShop.Application.DTOs.Common;
+using DigitekShop.Application.Features.Products.Commands.CreateProduct;
+using DigitekShop.Application.Features.Products.Commands.UpdateProduct;
+using DigitekShop.Application.Features.Products.Queries.GetProducts;
+using DigitekShop.Application.Features.Products.Queries.GetProduct;
 
 namespace DigitekShop.MVC.Controllers
 {
     public class ProductsController : Controller
     {
-        private readonly IProductService _productService;
-        private readonly ILogger<ProductsController> _logger;
+        private readonly IExternalService _externalService;
 
-        public ProductsController(IProductService productService, ILogger<ProductsController> logger)
+        public ProductsController(IExternalService externalService)
         {
-            _productService = productService;
-            _logger = logger;
+            _externalService = externalService;
         }
 
-        public async Task<IActionResult> Index(int pageNumber = 1, int pageSize = 12)
+        public async Task<IActionResult> Index(GetProductsQuery query = null)
         {
             try
             {
-                var products = await _productService.GetProductsAsync(pageNumber, pageSize);
+                var products = await _externalService.GetAsync<PagedResultDto<ProductListDto>>("api/products", query);
                 return View(products);
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error occurred while getting products");
-                return View(new PagedProductViewModel());
+                // Log the error
+                ModelState.AddModelError("", "خطا در دریافت محصولات");
+                return View(new PagedResultDto<ProductListDto> { Items = new List<ProductListDto>() });
             }
         }
 
@@ -33,128 +37,108 @@ namespace DigitekShop.MVC.Controllers
         {
             try
             {
-                var product = await _productService.GetProductByIdAsync(id);
-                
-                if (product == null)
-                {
-                    return NotFound();
-                }
-                
+                var product = await _externalService.GetAsync<ProductDto>($"api/products/{id}");
                 return View(product);
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error occurred while getting product details for ID: {ProductId}", id);
-                return NotFound();
+                ModelState.AddModelError("", "خطا در دریافت محصول");
+                return RedirectToAction(nameof(Index));
             }
         }
 
-        public async Task<IActionResult> Search(string searchTerm, int pageNumber = 1, int pageSize = 12)
+        public IActionResult Create()
         {
-            try
+            return View();
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Create(CreateProductCommand command)
+        {
+            if (ModelState.IsValid)
             {
-                if (string.IsNullOrWhiteSpace(searchTerm))
+                try
                 {
+                    var result = await _externalService.PostAsync<CreateProductCommand, ProductDto>("api/products", command);
                     return RedirectToAction(nameof(Index));
                 }
-
-                var products = await _productService.SearchProductsAsync(searchTerm, pageNumber, pageSize);
-                ViewBag.SearchTerm = searchTerm;
-                
-                return View("Index", products);
+                catch (Exception ex)
+                {
+                    ModelState.AddModelError("", "خطا در ایجاد محصول");
+                }
             }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error occurred while searching products");
-                return View("Index", new PagedProductViewModel());
-            }
+            return View(command);
         }
 
-        public async Task<IActionResult> Category(int categoryId, int pageNumber = 1, int pageSize = 12)
+        public async Task<IActionResult> Edit(int id)
         {
             try
             {
-                var products = await _productService.GetProductsByCategoryAsync(categoryId, pageNumber, pageSize);
-                ViewBag.CategoryId = categoryId;
-                
-                return View("Index", products);
+                var product = await _externalService.GetAsync<ProductDto>($"api/products/{id}");
+                var command = new UpdateProductCommand
+                {
+                    Id = product.Id,
+                    Name = product.Name,
+                    Description = product.Description,
+                    Price = product.Price,
+                    StockQuantity = product.StockQuantity
+                };
+                return View(command);
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error occurred while getting products by category: {CategoryId}", categoryId);
-                return View("Index", new PagedProductViewModel());
-            }
-        }
-
-        public async Task<IActionResult> TopSelling()
-        {
-            try
-            {
-                var products = await _productService.GetTopSellingProductsAsync(8);
-                return View(products);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error occurred while getting top selling products");
-                return View(new List<ProductViewModel>());
-            }
-        }
-
-        public async Task<IActionResult> NewArrivals()
-        {
-            try
-            {
-                var products = await _productService.GetNewArrivalsAsync(8);
-                return View(products);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error occurred while getting new arrivals");
-                return View(new List<ProductViewModel>());
+                ModelState.AddModelError("", "خطا در دریافت محصول");
+                return RedirectToAction(nameof(Index));
             }
         }
 
         [HttpPost]
-        public async Task<IActionResult> AdvancedSearch(ProductSearchViewModel searchModel)
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Edit(UpdateProductCommand command)
+        {
+            if (ModelState.IsValid)
+            {
+                try
+                {
+                    var result = await _externalService.PutAsync<UpdateProductCommand, ProductDto>($"api/products/{command.Id}", command);
+                    return RedirectToAction(nameof(Index));
+                }
+                catch (Exception ex)
+                {
+                    ModelState.AddModelError("", "خطا در بروزرسانی محصول");
+                }
+            }
+            return View(command);
+        }
+
+        public async Task<IActionResult> Delete(int id)
         {
             try
             {
-                if (searchModel.PageNumber <= 0)
-                    searchModel.PageNumber = 1;
-
-                if (searchModel.PageSize <= 0)
-                    searchModel.PageSize = 12;
-
-                PagedProductViewModel products;
-
-                if (!string.IsNullOrWhiteSpace(searchModel.SearchTerm))
-                {
-                    products = await _productService.SearchProductsAsync(
-                        searchModel.SearchTerm, 
-                        searchModel.PageNumber, 
-                        searchModel.PageSize);
-                }
-                else if (searchModel.CategoryId.HasValue)
-                {
-                    products = await _productService.GetProductsByCategoryAsync(
-                        searchModel.CategoryId.Value, 
-                        searchModel.PageNumber, 
-                        searchModel.PageSize);
-                }
-                else
-                {
-                    products = await _productService.GetProductsAsync(
-                        searchModel.PageNumber, 
-                        searchModel.PageSize);
-                }
-
-                ViewBag.SearchModel = searchModel;
-                return View("Index", products);
+                var product = await _externalService.GetAsync<ProductDto>($"api/products/{id}");
+                return View(product);
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error occurred while performing advanced search");
-                return View("Index", new PagedProductViewModel());
+                ModelState.AddModelError("", "خطا در دریافت محصول");
+                return RedirectToAction(nameof(Index));
+            }
+        }
+
+        [HttpPost, ActionName("Delete")]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> DeleteConfirmed(int id)
+        {
+            try
+            {
+                await _externalService.DeleteAsync($"api/products/{id}");
+                return RedirectToAction(nameof(Index));
+            }
+            catch (Exception ex)
+            {
+                ModelState.AddModelError("", "خطا در حذف محصول");
+                return RedirectToAction(nameof(Index));
             }
         }
     }

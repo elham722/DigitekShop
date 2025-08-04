@@ -4,6 +4,8 @@ using Microsoft.Extensions.DependencyInjection;
 using AutoMapper;
 using DigitekShop.Application.Profiles;
 using DigitekShop.Application.Features;
+using DigitekShop.Application.Services;
+using DigitekShop.Application.Interfaces;
 using DigitekShop.Domain.Services;
 
 namespace DigitekShop.Application
@@ -18,6 +20,10 @@ namespace DigitekShop.Application
             // Register Features (Commands and Queries)
             services.AddFeatures();
             services.AddScoped<OrderDomainService>();
+
+            // Register Dispatchers
+            services.AddScoped<IQueryDispatcher, QueryDispatcher>();
+            services.AddScoped<ICommandDispatcher, CommandDispatcher>();
 
             // Fix for CS1503: Use a lambda to configure MediatRServiceConfiguration
             services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(Assembly.GetExecutingAssembly()));

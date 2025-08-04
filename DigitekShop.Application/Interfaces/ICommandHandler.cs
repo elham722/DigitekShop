@@ -1,4 +1,5 @@
 using DigitekShop.Application.Responses;
+using MediatR;
 
 namespace DigitekShop.Application.Interfaces
 {
@@ -20,7 +21,7 @@ namespace DigitekShop.Application.Interfaces
     /// <summary>
     /// Base interface for Commands that return a result
     /// </summary>
-    public interface ICommand<TResult> : IRequest<TResult>
+    public interface ICommand<TResult> : MediatR.IRequest<TResult>
     {
     }
 

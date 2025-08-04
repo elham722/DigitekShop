@@ -1,3 +1,5 @@
+using MediatR;
+
 namespace DigitekShop.Application.Interfaces
 {
     /// <summary>
@@ -11,7 +13,7 @@ namespace DigitekShop.Application.Interfaces
     /// <summary>
     /// Base interface for Queries that return a result
     /// </summary>
-    public interface IQuery<TResult> : IRequest<TResult>
+    public interface IQuery<TResult> : MediatR.IRequest<TResult>
     {
     }
 } 

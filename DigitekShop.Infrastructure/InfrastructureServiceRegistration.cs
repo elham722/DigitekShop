@@ -1,8 +1,11 @@
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Http;
 using DigitekShop.Domain.Interfaces;
 using DigitekShop.Application.Interfaces.Infrastructure;
 using DigitekShop.Infrastructure.Email;
+using DigitekShop.Infrastructure.LocalStorage;
+using DigitekShop.Infrastructure.ExternalServices;
 using System.IO;
 
 namespace DigitekShop.Infrastructure
@@ -14,8 +17,20 @@ namespace DigitekShop.Infrastructure
             // Register Email Settings from configuration
             services.Configure<EmailSettings>(configuration.GetSection("EmailSettings"));
             
+            // Register LocalStorage Settings from configuration
+            services.Configure<LocalStorageOptions>(configuration.GetSection("LocalStorage"));
+            
+            // Register ExternalService Settings from configuration
+            services.Configure<ExternalServiceOptions>(configuration.GetSection("ExternalService"));
+            
             // Register Email Template Service
             services.AddSingleton<IEmailTemplateService, EmailTemplateService>();
+            
+            // Register LocalStorage Service
+            services.AddSingleton<ILocalStorageService, LocalStorageService>();
+
+            // Register ExternalService
+            services.AddHttpClient<IExternalService, ExternalService>();
             
             // Register Email Service - Choose one implementation based on your needs
             

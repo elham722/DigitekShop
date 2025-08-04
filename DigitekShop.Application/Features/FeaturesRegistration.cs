@@ -8,8 +8,6 @@ using DigitekShop.Application.Responses;
 using DigitekShop.Application.Features.Products.Commands.CreateProduct;
 using DigitekShop.Application.Features.Products.Commands.UpdateProduct;
 using DigitekShop.Application.Features.Products.Commands.DeleteProduct;
-using DigitekShop.Application.Features.Products.Queries.GetProduct;
-using DigitekShop.Application.Features.Products.Queries.GetProducts;
 using DigitekShop.Application.Features.Customers.Commands.CreateCustomer;
 using DigitekShop.Application.Features.Customers.Queries.GetCustomers;
 using DigitekShop.Application.Features.Orders.Commands.CreateOrder;
@@ -26,9 +24,6 @@ namespace DigitekShop.Application.Features
     {
         public static IServiceCollection AddFeatures(this IServiceCollection services)
         {
-            // Register Mediator
-            services.AddScoped<IMediator, Mediator>();
-
             // Register Validation Service
             services.AddScoped<IValidationService, ValidationService>();
 
@@ -43,9 +38,7 @@ namespace DigitekShop.Application.Features
             // Update the registration for DeleteProductCommandHandler to include the correct generic type parameters
             services.AddScoped<ICommandHandler<DeleteProductCommand, CommandResponse>, DeleteProductCommandHandler>();
 
-            // Product Queries
-            services.AddScoped<IQueryHandler<GetProductQuery, SuccessResponse<ProductDto>>, GetProductQueryHandler>();
-            services.AddScoped<IQueryHandler<GetProductsQuery, PagedResultDto<ProductListDto>>, GetProductsQueryHandler>();
+            // Product Queries - MediatR will auto-register these handlers
 
             // Customer Commands
             services.AddScoped<ICommandHandler<CreateCustomerCommand, CustomerDto>, CreateCustomerCommandHandler>();
