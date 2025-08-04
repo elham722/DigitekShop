@@ -3,6 +3,7 @@ using Microsoft.Extensions.Configuration;
 using DigitekShop.Domain.Interfaces;
 using DigitekShop.Application.Interfaces.Infrastructure;
 using DigitekShop.Infrastructure.Email;
+using DigitekShop.Infrastructure.LocalStorage;
 using System.IO;
 
 namespace DigitekShop.Infrastructure
@@ -14,8 +15,14 @@ namespace DigitekShop.Infrastructure
             // Register Email Settings from configuration
             services.Configure<EmailSettings>(configuration.GetSection("EmailSettings"));
             
+            // Register LocalStorage Settings from configuration
+            services.Configure<LocalStorageOptions>(configuration.GetSection("LocalStorage"));
+            
             // Register Email Template Service
             services.AddSingleton<IEmailTemplateService, EmailTemplateService>();
+            
+            // Register LocalStorage Service
+            services.AddSingleton<ILocalStorageService, LocalStorageService>();
             
             // Register Email Service - Choose one implementation based on your needs
             

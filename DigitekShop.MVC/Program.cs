@@ -1,9 +1,13 @@
 using DigitekShop.MVC.Services;
+using DigitekShop.Infrastructure;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
+
+// Add Infrastructure Services (including LocalStorage)
+builder.Services.AddInfrastructureServices(builder.Configuration);
 
 // Add HTTP Client
 builder.Services.AddHttpClient();
