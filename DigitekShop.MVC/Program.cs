@@ -1,7 +1,15 @@
+using DigitekShop.MVC.Services;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
+
+// Add HTTP Client
+builder.Services.AddHttpClient();
+
+// Add Product Service
+builder.Services.AddScoped<IProductService, ProductService>();
 
 var app = builder.Build();
 

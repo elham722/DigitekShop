@@ -1,0 +1,162 @@
+@model DigitekShop.MVC.Models.PagedProductViewModel
+@{
+    ViewData["Title"] = "محصولات";
+    var searchTerm = ViewBag.SearchTerm as string;
+    var categoryId = ViewBag.CategoryId as int?;
+}
+
+<div class="container mt-4">
+    <!-- Search Section -->
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <form asp-action="Search" method="get" class="d-flex">
+                <input type="text" name="searchTerm" class="form-control me-2" placeholder="جستجو در محصولات..." value="@searchTerm">
+                <button type="submit" class="btn btn-primary">جستجو</button>
+            </form>
+        </div>
+        <div class="col-md-4 text-end">
+            <a asp-action="TopSelling" class="btn btn-outline-success me-2">پرفروش‌ترین</a>
+            <a asp-action="NewArrivals" class="btn btn-outline-info">جدیدترین</a>
+        </div>
+    </div>
+
+    <!-- Results Header -->
+    <div class="row mb-3">
+        <div class="col">
+            @if (!string.IsNullOrEmpty(searchTerm))
+            {
+                <h4>نتایج جستجو برای: "@searchTerm"</h4>
+            }
+            else if (categoryId.HasValue)
+            {
+                <h4>محصولات دسته‌بندی</h4>
+            }
+            else
+            {
+                <h4>همه محصولات</h4>
+            }
+            <p class="text-muted">@Model.TotalCount محصول یافت شد</p>
+        </div>
+    </div>
+
+    <!-- Products Grid -->
+    @if (Model.Items.Any())
+    {
+        <div class="row">
+            @foreach (var product in Model.Items)
+            {
+                <div class="col-md-4 col-lg-3 mb-4">
+                    <div class="card h-100 shadow-sm">
+                        @if (!string.IsNullOrEmpty(product.ImageUrl))
+                        {
+                            <img src="@product.ImageUrl" class="card-img-top" alt="@product.Name" style="height: 200px; object-fit: cover;">
+                        }
+                        else
+                        {
+                            <div class="card-img-top bg-light d-flex align-items-center justify-content-center" style="height: 200px;">
+                                <i class="fas fa-image text-muted" style="font-size: 3rem;"></i>
+                            </div>
+                        }
+                        
+                        <div class="card-body d-flex flex-column">
+                            <h5 class="card-title">@product.Name</h5>
+                            <p class="card-text text-muted small">@product.Description</p>
+                            
+                            <div class="mt-auto">
+                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                    <span class="h5 text-primary mb-0">@product.Price.ToString("N0") @product.Currency</span>
+                                    <span class="badge bg-@(product.Status == "Active" ? "success" : "secondary")">@product.Status</span>
+                                </div>
+                                
+                                <div class="d-flex justify-content-between align-items-center mb-3">
+                                    <small class="text-muted">موجودی: @product.StockQuantity</small>
+                                    @if (product.AverageRating > 0)
+                                    {
+                                        <div class="text-warning">
+                                            @for (int i = 1; i <= 5; i++)
+                                            {
+                                                if (i <= product.AverageRating)
+                                                {
+                                                    <i class="fas fa-star"></i>
+                                                }
+                                                else if (i - 0.5 <= (double)product.AverageRating)
+                                                {
+                                                    <i class="fas fa-star-half-alt"></i>
+                                                }
+                                                else
+                                                {
+                                                    <i class="far fa-star"></i>
+                                                }
+                                            }
+                                            <small class="text-muted">(@product.ReviewCount)</small>
+                                        </div>
+                                    }
+                                </div>
+                                
+                                <a asp-action="Details" asp-route-id="@product.Id" class="btn btn-outline-primary w-100">
+                                    مشاهده جزئیات
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+
+        <!-- Pagination -->
+        @if (Model.TotalPages > 1)
+        {
+            <nav aria-label="صفحه‌بندی محصولات">
+                <ul class="pagination justify-content-center">
+                    @if (Model.HasPreviousPage)
+                    {
+                        <li class="page-item">
+                            <a class="page-link" asp-action="Index" asp-route-pageNumber="@(Model.PageNumber - 1)" asp-route-pageSize="@Model.PageSize">
+                                قبلی
+                            </a>
+                        </li>
+                    }
+
+                    @for (int i = Math.Max(1, Model.PageNumber - 2); i <= Math.Min(Model.TotalPages, Model.PageNumber + 2); i++)
+                    {
+                        <li class="page-item @(i == Model.PageNumber ? "active" : "")">
+                            <a class="page-link" asp-action="Index" asp-route-pageNumber="@i" asp-route-pageSize="@Model.PageSize">@i</a>
+                        </li>
+                    }
+
+                    @if (Model.HasNextPage)
+                    {
+                        <li class="page-item">
+                            <a class="page-link" asp-action="Index" asp-route-pageNumber="@(Model.PageNumber + 1)" asp-route-pageSize="@Model.PageSize">
+                                بعدی
+                            </a>
+                        </li>
+                    }
+                </ul>
+            </nav>
+        }
+    }
+    else
+    {
+        <div class="text-center py-5">
+            <i class="fas fa-search text-muted" style="font-size: 4rem;"></i>
+            <h4 class="mt-3 text-muted">محصولی یافت نشد</h4>
+            <p class="text-muted">متأسفانه محصولی با این شرایط یافت نشد.</p>
+            <a asp-action="Index" class="btn btn-primary">بازگشت به همه محصولات</a>
+        </div>
+    }
+</div>
+
+@section Scripts {
+    <script>
+        // Add any JavaScript for enhanced functionality
+        $(document).ready(function() {
+            // Auto-submit search form on enter
+            $('input[name="searchTerm"]').on('keypress', function(e) {
+                if (e.which === 13) {
+                    $(this).closest('form').submit();
+                }
+            });
+        });
+    </script>
+} 

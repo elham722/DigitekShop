@@ -1,0 +1,220 @@
+@model DigitekShop.MVC.Models.ProductViewModel
+@{
+    ViewData["Title"] = Model.Name;
+}
+
+<div class="container mt-4">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a asp-controller="Home" asp-action="Index">خانه</a></li>
+            <li class="breadcrumb-item"><a asp-controller="Products" asp-action="Index">محصولات</a></li>
+            <li class="breadcrumb-item active" aria-current="page">@Model.Name</li>
+        </ol>
+    </nav>
+
+    <div class="row">
+        <!-- Product Image -->
+        <div class="col-md-6">
+            <div class="card">
+                @if (!string.IsNullOrEmpty(Model.ImageUrl))
+                {
+                    <img src="@Model.ImageUrl" class="card-img-top" alt="@Model.Name" style="max-height: 400px; object-fit: cover;">
+                }
+                else
+                {
+                    <div class="card-img-top bg-light d-flex align-items-center justify-content-center" style="height: 400px;">
+                        <i class="fas fa-image text-muted" style="font-size: 5rem;"></i>
+                    </div>
+                }
+            </div>
+        </div>
+
+        <!-- Product Details -->
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-body">
+                    <h2 class="card-title">@Model.Name</h2>
+                    
+                    <!-- Rating -->
+                    @if (Model.AverageRating > 0)
+                    {
+                        <div class="mb-3">
+                            <div class="text-warning">
+                                @for (int i = 1; i <= 5; i++)
+                                {
+                                    if (i <= Model.AverageRating)
+                                    {
+                                        <i class="fas fa-star"></i>
+                                    }
+                                    else if (i - 0.5 <= (double)Model.AverageRating)
+                                    {
+                                        <i class="fas fa-star-half-alt"></i>
+                                    }
+                                    else
+                                    {
+                                        <i class="far fa-star"></i>
+                                    }
+                                }
+                                <span class="text-muted ms-2">@Model.AverageRating.ToString("F1") از 5 (@Model.ReviewCount نظر)</span>
+                            </div>
+                        </div>
+                    }
+
+                    <!-- Price -->
+                    <div class="mb-3">
+                        <h3 class="text-primary">@Model.Price.ToString("N0") @Model.Currency</h3>
+                    </div>
+
+                    <!-- Status Badge -->
+                    <div class="mb-3">
+                        <span class="badge bg-@(Model.Status == "Active" ? "success" : "secondary") fs-6">@Model.Status</span>
+                    </div>
+
+                    <!-- Description -->
+                    <div class="mb-3">
+                        <h5>توضیحات:</h5>
+                        <p class="text-muted">@Model.Description</p>
+                    </div>
+
+                    <!-- Stock Status -->
+                    <div class="mb-3">
+                        @if (Model.StockQuantity > 0)
+                        {
+                            <span class="text-success">
+                                <i class="fas fa-check-circle"></i> موجود در انبار (@Model.StockQuantity عدد)
+                            </span>
+                        }
+                        else
+                        {
+                            <span class="text-danger">
+                                <i class="fas fa-times-circle"></i> ناموجود
+                            </span>
+                        }
+                    </div>
+
+                    <!-- Action Buttons -->
+                    <div class="d-grid gap-2">
+                        @if (Model.StockQuantity > 0)
+                        {
+                            <button class="btn btn-primary btn-lg">
+                                <i class="fas fa-shopping-cart"></i> افزودن به سبد خرید
+                            </button>
+                        }
+                        <button class="btn btn-outline-secondary">
+                            <i class="fas fa-heart"></i> افزودن به علاقه‌مندی‌ها
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Product Specifications -->
+    <div class="row mt-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">مشخصات محصول</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <table class="table table-borderless">
+                                <tbody>
+                                    <tr>
+                                        <th scope="row" class="text-muted">کد محصول:</th>
+                                        <td>@Model.SKU</td>
+                                    </tr>
+                                    <tr>
+                                        <th scope="row" class="text-muted">دسته‌بندی:</th>
+                                        <td>@Model.CategoryName</td>
+                                    </tr>
+                                    @if (!string.IsNullOrEmpty(Model.BrandName))
+                                    {
+                                        <tr>
+                                            <th scope="row" class="text-muted">برند:</th>
+                                            <td>@Model.BrandName</td>
+                                        </tr>
+                                    }
+                                    @if (!string.IsNullOrEmpty(Model.Model))
+                                    {
+                                        <tr>
+                                            <th scope="row" class="text-muted">مدل:</th>
+                                            <td>@Model.Model</td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="col-md-6">
+                            <table class="table table-borderless">
+                                <tbody>
+                                    <tr>
+                                        <th scope="row" class="text-muted">وزن:</th>
+                                        <td>@Model.Weight کیلوگرم</td>
+                                    </tr>
+                                    <tr>
+                                        <th scope="row" class="text-muted">وضعیت:</th>
+                                        <td>
+                                            <span class="badge bg-@(Model.Status == "Active" ? "success" : "secondary")">@Model.Status</span>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <th scope="row" class="text-muted">تاریخ ایجاد:</th>
+                                        <td>@Model.CreatedAt.ToString("yyyy/MM/dd")</td>
+                                    </tr>
+                                    @if (Model.UpdatedAt.HasValue)
+                                    {
+                                        <tr>
+                                            <th scope="row" class="text-muted">آخرین بروزرسانی:</th>
+                                            <td>@Model.UpdatedAt.Value.ToString("yyyy/MM/dd")</td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Related Products Section -->
+    <div class="row mt-4">
+        <div class="col-12">
+            <h4>محصولات مشابه</h4>
+            <div class="row">
+                <div class="col-12 text-center">
+                    <p class="text-muted">این بخش در آینده تکمیل خواهد شد</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Back to Products -->
+    <div class="row mt-4">
+        <div class="col-12 text-center">
+            <a asp-controller="Products" asp-action="Index" class="btn btn-outline-primary">
+                <i class="fas fa-arrow-left"></i> بازگشت به لیست محصولات
+            </a>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function() {
+            // Add to cart functionality
+            $('.btn-primary').click(function() {
+                // TODO: Implement add to cart functionality
+                alert('این قابلیت در آینده پیاده‌سازی خواهد شد');
+            });
+
+            // Add to wishlist functionality
+            $('.btn-outline-secondary').click(function() {
+                // TODO: Implement add to wishlist functionality
+                alert('این قابلیت در آینده پیاده‌سازی خواهد شد');
+            });
+        });
+    </script>
+} 

@@ -1,4 +1,5 @@
 using DigitekShop.MVC.Models;
+using DigitekShop.MVC.Services;
 using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics;
 
@@ -7,15 +8,30 @@ namespace DigitekShop.MVC.Controllers
     public class HomeController : Controller
     {
         private readonly ILogger<HomeController> _logger;
+        private readonly IProductService _productService;
 
-        public HomeController(ILogger<HomeController> logger)
+        public HomeController(ILogger<HomeController> logger, IProductService productService)
         {
             _logger = logger;
+            _productService = productService;
         }
 
-        public IActionResult Index()
+        public async Task<IActionResult> Index()
         {
-            return View();
+            try
+            {
+                // Get some featured products for the home page
+                var featuredProducts = await _productService.GetTopSellingProductsAsync(6);
+                ViewBag.FeaturedProducts = featuredProducts;
+                
+                return View();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error occurred while loading home page");
+                ViewBag.FeaturedProducts = new List<ProductViewModel>();
+                return View();
+            }
         }
 
         public IActionResult Privacy()
