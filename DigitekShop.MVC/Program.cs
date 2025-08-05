@@ -1,5 +1,9 @@
 
 using DigitekShop.Infrastructure;
+using DigitekShop.Identity.Models;
+using DigitekShop.Identity.Context;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -11,6 +15,29 @@ builder.Services.AddInfrastructureServices(builder.Configuration);
 
 // Add HTTP Client
 builder.Services.AddHttpClient();
+
+// Add Identity Services
+builder.Services.AddDbContext<DigitekShopIdentityDbContext>(options =>
+    options.UseSqlServer(builder.Configuration.GetConnectionString("IdentityConnection")));
+
+builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
+{
+    options.Password.RequireDigit = true;
+    options.Password.RequireLowercase = true;
+    options.Password.RequireUppercase = true;
+    options.Password.RequireNonAlphanumeric = true;
+    options.Password.RequiredLength = 6;
+})
+.AddEntityFrameworkStores<DigitekShopIdentityDbContext>()
+.AddDefaultTokenProviders();
+
+// Configure Identity Options
+builder.Services.ConfigureApplicationCookie(options =>
+{
+    options.LoginPath = "/Account/Login";
+    options.LogoutPath = "/Account/Logout";
+    options.AccessDeniedPath = "/Account/AccessDenied";
+});
 
 
 
@@ -27,6 +54,7 @@ if (!app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 app.UseRouting();
 
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapStaticAssets();
