@@ -12,12 +12,14 @@ using DigitekShop.Api.Attributes;
 using DigitekShop.Application.Exceptions;
 using DigitekShop.Domain.Exceptions;
 using DigitekShop.Application.Extensions;
+using Microsoft.AspNetCore.Authorization;
 
 namespace DigitekShop.Api.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
     [CorsPolicy]
+    [Authorize]
     public class ProductsController : ControllerBase
     {
         private readonly ILogger<ProductsController> _logger;
