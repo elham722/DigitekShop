@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using AutoMapper;
 using DigitekShop.Application.Interfaces.Identity;
 using DigitekShop.Identity.Models;
 using DigitekShop.Identity.Context;
@@ -16,15 +17,18 @@ namespace DigitekShop.Identity.Services
         private readonly RoleManager<IdentityRole<string>> _roleManager;
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly DigitekShopIdentityDbContext _context;
+        private readonly IMapper _mapper;
 
         public PermissionService(
             RoleManager<IdentityRole<string>> roleManager,
             UserManager<ApplicationUser> userManager,
-            DigitekShopIdentityDbContext context)
+            DigitekShopIdentityDbContext context,
+            IMapper mapper)
         {
             _roleManager = roleManager;
             _userManager = userManager;
             _context = context;
+            _mapper = mapper;
         }
 
         #region Permission CRUD Operations

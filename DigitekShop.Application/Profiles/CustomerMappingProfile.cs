@@ -16,7 +16,7 @@ namespace DigitekShop.Application.Profiles
                 .ForMember(dest => dest.Address, opt => opt.MapFrom(src => src.Address != null ? src.Address.Street : null))
                 .ForMember(dest => dest.City, opt => opt.MapFrom(src => src.Address != null ? src.Address.City : null))
                 .ForMember(dest => dest.State, opt => opt.MapFrom(src => src.Address != null ? src.Address.Province : null))
-                .ForMember(dest => dest.Country, opt => opt.MapFrom(src => src.Address != null ? src.Address.Province : null))
+                .ForMember(dest => dest.Country, opt => opt.MapFrom(src => src.Address != null ? "ایران" : null))
                 .ForMember(dest => dest.PostalCode, opt => opt.MapFrom(src => src.Address != null ? src.Address.PostalCode : null))
                 .ForMember(dest => dest.OrderCount, opt => opt.MapFrom(src => src.Orders.Count))
                 .ForMember(dest => dest.ReviewCount, opt => opt.MapFrom(src => src.Reviews.Count))

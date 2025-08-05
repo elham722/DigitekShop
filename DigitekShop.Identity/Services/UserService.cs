@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using AutoMapper;
 using DigitekShop.Application.Interfaces.Identity;
 using DigitekShop.Identity.Models;
 using DigitekShop.Identity.Context;
@@ -15,11 +16,13 @@ namespace DigitekShop.Identity.Services
     {
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly DigitekShopIdentityDbContext _context;
+        private readonly IMapper _mapper;
 
-        public UserService(UserManager<ApplicationUser> userManager, DigitekShopIdentityDbContext context)
+        public UserService(UserManager<ApplicationUser> userManager, DigitekShopIdentityDbContext context, IMapper mapper)
         {
             _userManager = userManager;
             _context = context;
+            _mapper = mapper;
         }
 
         #region User CRUD Operations
@@ -30,7 +33,9 @@ namespace DigitekShop.Identity.Services
             if (user == null) return null!;
 
             var roles = await _userManager.GetRolesAsync(user);
-            return MapToUserDto(user, roles);
+            var userDto = _mapper.Map<UserDto>(user);
+            userDto.Roles = roles.ToList();
+            return userDto;
         }
 
         public async Task<UserDto> GetUserByEmailAsync(string email)
@@ -39,7 +44,9 @@ namespace DigitekShop.Identity.Services
             if (user == null) return null!;
 
             var roles = await _userManager.GetRolesAsync(user);
-            return MapToUserDto(user, roles);
+            var userDto = _mapper.Map<UserDto>(user);
+            userDto.Roles = roles.ToList();
+            return userDto;
         }
 
         public async Task<UserDto> GetUserByUserNameAsync(string userName)
@@ -48,7 +55,9 @@ namespace DigitekShop.Identity.Services
             if (user == null) return null!;
 
             var roles = await _userManager.GetRolesAsync(user);
-            return MapToUserDto(user, roles);
+            var userDto = _mapper.Map<UserDto>(user);
+            userDto.Roles = roles.ToList();
+            return userDto;
         }
 
         public async Task<IEnumerable<UserDto>> GetAllUsersAsync(int page = 1, int pageSize = 20)
@@ -62,7 +71,9 @@ namespace DigitekShop.Identity.Services
             foreach (var user in users)
             {
                 var roles = await _userManager.GetRolesAsync(user);
-                userDtos.Add(MapToUserDto(user, roles));
+                var userDto = _mapper.Map<UserDto>(user);
+                userDto.Roles = roles.ToList();
+                userDtos.Add(userDto);
             }
 
             return userDtos;
@@ -80,7 +91,9 @@ namespace DigitekShop.Identity.Services
             foreach (var user in users)
             {
                 var roles = await _userManager.GetRolesAsync(user);
-                userDtos.Add(MapToUserDto(user, roles));
+                var userDto = _mapper.Map<UserDto>(user);
+                userDto.Roles = roles.ToList();
+                userDtos.Add(userDto);
             }
 
             return userDtos;
@@ -98,7 +111,9 @@ namespace DigitekShop.Identity.Services
             foreach (var user in users)
             {
                 var roles = await _userManager.GetRolesAsync(user);
-                userDtos.Add(MapToUserDto(user, roles));
+                var userDto = _mapper.Map<UserDto>(user);
+                userDto.Roles = roles.ToList();
+                userDtos.Add(userDto);
             }
 
             return userDtos;
@@ -116,7 +131,9 @@ namespace DigitekShop.Identity.Services
             foreach (var user in users)
             {
                 var roles = await _userManager.GetRolesAsync(user);
-                userDtos.Add(MapToUserDto(user, roles));
+                var userDto = _mapper.Map<UserDto>(user);
+                userDto.Roles = roles.ToList();
+                userDtos.Add(userDto);
             }
 
             return userDtos;
@@ -168,7 +185,9 @@ namespace DigitekShop.Identity.Services
             }
 
             var roles = await _userManager.GetRolesAsync(user);
-            return MapToUserDto(user, roles);
+            var userDto = _mapper.Map<UserDto>(user);
+            userDto.Roles = roles.ToList();
+            return userDto;
         }
 
         public async Task<UserDto> RegisterUserAsync(RegisterUserDto registerUserDto)
@@ -225,7 +244,9 @@ namespace DigitekShop.Identity.Services
             }
 
             var roles = await _userManager.GetRolesAsync(user);
-            return MapToUserDto(user, roles);
+            var userDto = _mapper.Map<UserDto>(user);
+            userDto.Roles = roles.ToList();
+            return userDto;
         }
 
         public async Task<UserDto> UpdateContactInfoAsync(string userId, UpdateContactInfoDto updateContactInfoDto)
@@ -242,7 +263,9 @@ namespace DigitekShop.Identity.Services
             }
 
             var roles = await _userManager.GetRolesAsync(user);
-            return MapToUserDto(user, roles);
+            var userDto = _mapper.Map<UserDto>(user);
+            userDto.Roles = roles.ToList();
+            return userDto;
         }
 
 
@@ -504,7 +527,9 @@ namespace DigitekShop.Identity.Services
             foreach (var user in users)
             {
                 var roles = await _userManager.GetRolesAsync(user);
-                userDtos.Add(MapToUserDto(user, roles));
+                var userDto = _mapper.Map<UserDto>(user);
+                userDto.Roles = roles.ToList();
+                userDtos.Add(userDto);
             }
 
             return userDtos;
@@ -522,7 +547,9 @@ namespace DigitekShop.Identity.Services
             foreach (var user in users)
             {
                 var roles = await _userManager.GetRolesAsync(user);
-                userDtos.Add(MapToUserDto(user, roles));
+                var userDto = _mapper.Map<UserDto>(user);
+                userDto.Roles = roles.ToList();
+                userDtos.Add(userDto);
             }
 
             return userDtos;
@@ -540,7 +567,9 @@ namespace DigitekShop.Identity.Services
             foreach (var user in users)
             {
                 var roles = await _userManager.GetRolesAsync(user);
-                userDtos.Add(MapToUserDto(user, roles));
+                var userDto = _mapper.Map<UserDto>(user);
+                userDto.Roles = roles.ToList();
+                userDtos.Add(userDto);
             }
 
             return userDtos;
@@ -565,7 +594,9 @@ namespace DigitekShop.Identity.Services
             foreach (var user in pagedUsers)
             {
                 var roles = await _userManager.GetRolesAsync(user);
-                userDtos.Add(MapToUserDto(user, roles));
+                var userDto = _mapper.Map<UserDto>(user);
+                userDto.Roles = roles.ToList();
+                userDtos.Add(userDto);
             }
 
             return userDtos;
@@ -772,52 +803,6 @@ namespace DigitekShop.Identity.Services
 
         #endregion
 
-        #region Private Methods
-
-        private static UserDto MapToUserDto(ApplicationUser user, IEnumerable<string> roles)
-        {
-            return new UserDto
-            {
-                Id = user.Id,
-                UserName = user.UserName ?? string.Empty,
-                Email = user.Email ?? string.Empty,
-                PhoneNumber = user.PhoneNumber,
-                FirstName = user.FirstName,
-                LastName = user.LastName,
-                MiddleName = user.MiddleName,
-                FullName = user.FullName,
-                DisplayName = user.DisplayName,
-                DateOfBirth = user.DateOfBirth,
-                Age = user.Age,
-                Gender = user.Gender,
-                CreatedAt = user.CreatedAt,
-                LastLoginAt = user.LastLoginAt,
-                LastPasswordChangeAt = user.LastPasswordChangeAt,
-                LoginAttempts = user.LoginAttempts,
-                IsActive = user.IsActive,
-                IsDeleted = user.IsDeleted,
-                DeletedAt = user.DeletedAt,
-                EmailConfirmed = user.EmailConfirmed,
-                PhoneNumberConfirmed = user.PhoneNumberConfirmed,
-                TwoFactorEnabled = user.TwoFactorEnabled,
-                TwoFactorEnabledAt = user.TwoFactorEnabledAt,
-                CustomerId = user.CustomerId,
-                CreatedBy = user.CreatedBy,
-                UpdatedBy = user.UpdatedBy,
-                UpdatedAt = user.UpdatedAt,
-                IsLocked = user.IsLocked,
-                IsNewUser = user.IsNewUser,
-                RequiresPasswordChange = user.RequiresPasswordChange(),
-                IsPasswordExpired = user.IsPasswordExpired(),
-                Roles = roles,
-                Permissions = new List<string>(), // Would be populated from permissions service
-                TotalLogins = 0, // Would be populated from login history
-                LastActivityAt = user.LastLoginAt,
-                LastIpAddress = null, // Would be populated from login history
-                LastUserAgent = null // Would be populated from login history
-            };
-        }
-
-        #endregion
+        
     }
 } 

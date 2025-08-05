@@ -8,6 +8,7 @@ using Microsoft.IdentityModel.Tokens;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using DigitekShop.Application.Interfaces.Identity;
@@ -23,6 +24,10 @@ namespace DigitekShop.Identity
         public static IServiceCollection ConfigureIdentityServices(this IServiceCollection services,
             IConfiguration configuration)
         {
+            // Specify assemblies to scan for AutoMapper profiles
+            services.AddAutoMapper(cfg => cfg.AddMaps(Assembly.GetExecutingAssembly()));
+
+
             services.Configure<JwtSettings>(configuration.GetSection("JwtSettings"));
             services.AddDbContext<DigitekShopIdentityDbContext>(options =>
             {

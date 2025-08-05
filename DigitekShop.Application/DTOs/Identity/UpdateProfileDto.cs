@@ -16,6 +16,9 @@ namespace DigitekShop.Application.DTOs.Identity
         [StringLength(50)]
         public string? MiddleName { get; set; }
 
+        [StringLength(100)]
+        public string? DisplayName { get; set; }
+
         public DateTime? DateOfBirth { get; set; }
 
         [StringLength(10)]

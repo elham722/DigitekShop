@@ -10,6 +10,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
+using AutoMapper;
 using DigitekShop.Application.Interfaces.Identity;
 using DigitekShop.Identity.Models;
 using DigitekShop.Identity.Context;
@@ -26,6 +27,7 @@ namespace DigitekShop.Identity.Services
         private readonly IConfiguration _configuration;
         private readonly IUserService _userService;
         private readonly IPermissionService _permissionService;
+        private readonly IMapper _mapper;
 
         public AuthService(
             UserManager<ApplicationUser> userManager,
@@ -34,7 +36,8 @@ namespace DigitekShop.Identity.Services
             DigitekShopIdentityDbContext context,
             IConfiguration configuration,
             IUserService userService,
-            IPermissionService permissionService)
+            IPermissionService permissionService,
+            IMapper mapper)
         {
             _userManager = userManager;
             _signInManager = signInManager;
@@ -43,6 +46,7 @@ namespace DigitekShop.Identity.Services
             _configuration = configuration;
             _userService = userService;
             _permissionService = permissionService;
+            _mapper = mapper;
         }
 
         #region Login & Authentication

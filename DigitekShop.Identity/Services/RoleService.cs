@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using AutoMapper;
 using DigitekShop.Application.Interfaces.Identity;
 using DigitekShop.Identity.Models;
 using DigitekShop.Identity.Context;
@@ -16,15 +17,18 @@ namespace DigitekShop.Identity.Services
         private readonly RoleManager<IdentityRole<string>> _roleManager;
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly DigitekShopIdentityDbContext _context;
+        private readonly IMapper _mapper;
 
         public RoleService(
             RoleManager<IdentityRole<string>> roleManager,
             UserManager<ApplicationUser> userManager,
-            DigitekShopIdentityDbContext context)
+            DigitekShopIdentityDbContext context,
+            IMapper mapper)
         {
             _roleManager = roleManager;
             _userManager = userManager;
             _context = context;
+            _mapper = mapper;
         }
 
         #region Role CRUD Operations
@@ -34,7 +38,7 @@ namespace DigitekShop.Identity.Services
             var role = await _roleManager.FindByIdAsync(roleId);
             if (role == null) return null!;
 
-            return MapToRoleDto(role);
+            return _mapper.Map<RoleDto>(role);
         }
 
         public async Task<RoleDto> GetRoleByNameAsync(string roleName)
@@ -42,13 +46,13 @@ namespace DigitekShop.Identity.Services
             var role = await _roleManager.FindByNameAsync(roleName);
             if (role == null) return null!;
 
-            return MapToRoleDto(role);
+            return _mapper.Map<RoleDto>(role);
         }
 
         public async Task<IEnumerable<RoleDto>> GetAllRolesAsync()
         {
             var roles = await _roleManager.Roles.ToListAsync();
-            return roles.Select(MapToRoleDto);
+            return _mapper.Map<IEnumerable<RoleDto>>(roles);
         }
 
         public async Task<IEnumerable<RoleDto>> GetActiveRolesAsync()
@@ -56,7 +60,7 @@ namespace DigitekShop.Identity.Services
             var roles = await _roleManager.Roles
                 .Where(r => !r.Name.StartsWith("Deleted_"))
                 .ToListAsync();
-            return roles.Select(MapToRoleDto);
+            return _mapper.Map<IEnumerable<RoleDto>>(roles);
         }
 
         public async Task<int> GetTotalRolesCountAsync()
@@ -89,7 +93,7 @@ namespace DigitekShop.Identity.Services
                 throw new Exception($"Failed to create role: {string.Join(", ", result.Errors.Select(e => e.Description))}");
             }
 
-            return MapToRoleDto(role);
+            return _mapper.Map<RoleDto>(role);
         }
 
         public async Task<RoleDto> UpdateRoleAsync(string roleId, UpdateRoleDto updateRoleDto)
@@ -109,7 +113,7 @@ namespace DigitekShop.Identity.Services
                 throw new Exception($"Failed to update role: {string.Join(", ", result.Errors.Select(e => e.Description))}");
             }
 
-            return MapToRoleDto(role);
+            return _mapper.Map<RoleDto>(role);
         }
 
         public async Task<bool> DeleteRoleAsync(string roleId)
@@ -191,7 +195,9 @@ namespace DigitekShop.Identity.Services
             foreach (var user in users)
             {
                 var roles = await _userManager.GetRolesAsync(user);
-                userDtos.Add(MapToUserDto(user, roles));
+                var userDto = _mapper.Map<UserDto>(user);
+                userDto.Roles = roles.ToList();
+                userDtos.Add(userDto);
             }
 
             return userDtos;
@@ -294,7 +300,7 @@ namespace DigitekShop.Identity.Services
                 .Take(pageSize)
                 .ToListAsync();
 
-            return roles.Select(MapToRoleDto);
+            return _mapper.Map<IEnumerable<RoleDto>>(roles);
         }
 
         public async Task<IEnumerable<RoleDto>> GetRolesByDateRangeAsync(DateTime fromDate, DateTime toDate, int page = 1, int pageSize = 20)
@@ -306,7 +312,7 @@ namespace DigitekShop.Identity.Services
                 .Take(pageSize)
                 .ToListAsync();
 
-            return roles.Select(MapToRoleDto);
+            return _mapper.Map<IEnumerable<RoleDto>>(roles);
         }
 
         #endregion
@@ -385,75 +391,5 @@ namespace DigitekShop.Identity.Services
 
         #endregion
 
-        #region Private Methods
-
-        private static RoleDto MapToRoleDto(IdentityRole<string> role)
-        {
-            return new RoleDto
-            {
-                Id = role.Id,
-                Name = role.Name,
-                NormalizedName = role.NormalizedName,
-                IsActive = !role.Name.StartsWith("Deleted_"),
-                IsDeleted = role.Name.StartsWith("Deleted_"),
-                CreatedAt = DateTime.UtcNow, // Identity doesn't have CreatedAt by default
-                UpdatedAt = DateTime.UtcNow, // Identity doesn't have UpdatedAt by default
-                IsSystemRole = IsSystemRole(role.Name),
-                UserCount = 0, // Would be populated from actual data
-                PermissionCount = 0 // Would be populated from permissions
-            };
-        }
-
-        private static UserDto MapToUserDto(ApplicationUser user, IEnumerable<string> roles)
-        {
-            return new UserDto
-            {
-                Id = user.Id,
-                UserName = user.UserName ?? string.Empty,
-                Email = user.Email ?? string.Empty,
-                PhoneNumber = user.PhoneNumber,
-                FirstName = user.FirstName,
-                LastName = user.LastName,
-                MiddleName = user.MiddleName,
-                FullName = user.FullName,
-                DisplayName = user.DisplayName,
-                DateOfBirth = user.DateOfBirth,
-                Age = user.Age,
-                Gender = user.Gender,
-                CreatedAt = user.CreatedAt,
-                LastLoginAt = user.LastLoginAt,
-                LastPasswordChangeAt = user.LastPasswordChangeAt,
-                LoginAttempts = user.LoginAttempts,
-                IsActive = user.IsActive,
-                IsDeleted = user.IsDeleted,
-                DeletedAt = user.DeletedAt,
-                EmailConfirmed = user.EmailConfirmed,
-                PhoneNumberConfirmed = user.PhoneNumberConfirmed,
-                TwoFactorEnabled = user.TwoFactorEnabled,
-                TwoFactorEnabledAt = user.TwoFactorEnabledAt,
-                CustomerId = user.CustomerId,
-                CreatedBy = user.CreatedBy,
-                UpdatedBy = user.UpdatedBy,
-                UpdatedAt = user.UpdatedAt,
-                IsLocked = user.IsLocked,
-                IsNewUser = user.IsNewUser,
-                RequiresPasswordChange = user.RequiresPasswordChange(),
-                IsPasswordExpired = user.IsPasswordExpired(),
-                Roles = roles,
-                Permissions = new List<string>(),
-                TotalLogins = 0,
-                LastActivityAt = user.LastLoginAt,
-                LastIpAddress = null,
-                LastUserAgent = null
-            };
-        }
-
-        private static bool IsSystemRole(string roleName)
-        {
-            var systemRoles = new[] { "Admin", "Customer", "Manager", "Support" };
-            return systemRoles.Contains(roleName, StringComparer.OrdinalIgnoreCase);
-        }
-
-        #endregion
     }
 } 

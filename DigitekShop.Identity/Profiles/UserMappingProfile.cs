@@ -1,0 +1,160 @@
+using AutoMapper;
+using DigitekShop.Identity.Models;
+using DigitekShop.Application.DTOs.Identity;
+
+namespace DigitekShop.Identity.Profiles
+{
+    public class UserMappingProfile : Profile
+    {
+        public UserMappingProfile()
+        {
+            // ApplicationUser -> UserDto
+            CreateMap<ApplicationUser, UserDto>()
+                .ForMember(dest => dest.FullName, opt => opt.MapFrom(src => 
+                    $"{src.FirstName} {src.LastName}".Trim()))
+                .ForMember(dest => dest.DisplayName, opt => opt.MapFrom(src => 
+                    !string.IsNullOrEmpty(src.DisplayName) ? src.DisplayName : 
+                    $"{src.FirstName} {src.LastName}".Trim()))
+                .ForMember(dest => dest.Age, opt => opt.MapFrom(src => 
+                    src.DateOfBirth.HasValue ? 
+                    DateTime.UtcNow.Year - src.DateOfBirth.Value.Year : (int?)null))
+                .ForMember(dest => dest.IsNewUser, opt => opt.MapFrom(src => 
+                    src.CreatedAt >= DateTime.UtcNow.AddDays(-30)))
+                .ForMember(dest => dest.IsLocked, opt => opt.MapFrom(src => 
+                    src.LockoutEnd.HasValue && src.LockoutEnd > DateTime.UtcNow))
+                .ForMember(dest => dest.Roles, opt => opt.Ignore())
+                .ForMember(dest => dest.Permissions, opt => opt.Ignore())
+                .ForMember(dest => dest.TotalLogins, opt => opt.Ignore())
+                .ForMember(dest => dest.LastActivityAt, opt => opt.MapFrom(src => src.LastLoginAt))
+                .ForMember(dest => dest.LastIpAddress, opt => opt.Ignore())
+                .ForMember(dest => dest.LastUserAgent, opt => opt.Ignore());
+
+            // CreateUserDto -> ApplicationUser
+            CreateMap<CreateUserDto, ApplicationUser>()
+                .ForMember(dest => dest.UserName, opt => opt.MapFrom(src => src.Email))
+                .ForMember(dest => dest.NormalizedUserName, opt => opt.MapFrom(src => src.Email.ToUpperInvariant()))
+                .ForMember(dest => dest.NormalizedEmail, opt => opt.MapFrom(src => src.Email.ToUpperInvariant()))
+                .ForMember(dest => dest.EmailConfirmed, opt => opt.MapFrom(src => false))
+                .ForMember(dest => dest.PhoneNumberConfirmed, opt => opt.MapFrom(src => false))
+                .ForMember(dest => dest.TwoFactorEnabled, opt => opt.MapFrom(src => false))
+                .ForMember(dest => dest.LockoutEnabled, opt => opt.MapFrom(src => true))
+                .ForMember(dest => dest.AccessFailedCount, opt => opt.MapFrom(src => 0))
+                .ForMember(dest => dest.IsActive, opt => opt.MapFrom(src => true))
+                .ForMember(dest => dest.IsDeleted, opt => opt.MapFrom(src => false))
+                .ForMember(dest => dest.LoginAttempts, opt => opt.MapFrom(src => 0))
+                .ForMember(dest => dest.CreatedAt, opt => opt.MapFrom(src => DateTime.UtcNow))
+                .ForMember(dest => dest.Id, opt => opt.Ignore())
+                .ForMember(dest => dest.ConcurrencyStamp, opt => opt.Ignore())
+                .ForMember(dest => dest.SecurityStamp, opt => opt.Ignore())
+                .ForMember(dest => dest.PasswordHash, opt => opt.Ignore())
+                .ForMember(dest => dest.LockoutEnd, opt => opt.Ignore())
+                .ForMember(dest => dest.LastLoginAt, opt => opt.Ignore())
+                .ForMember(dest => dest.LastPasswordChangeAt, opt => opt.Ignore())
+                .ForMember(dest => dest.TwoFactorEnabledAt, opt => opt.Ignore())
+                .ForMember(dest => dest.UpdatedAt, opt => opt.Ignore())
+                .ForMember(dest => dest.DeletedAt, opt => opt.Ignore())
+                .ForMember(dest => dest.CreatedBy, opt => opt.Ignore())
+                .ForMember(dest => dest.UpdatedBy, opt => opt.Ignore());
+
+            // UpdateProfileDto -> ApplicationUser (partial update)
+            CreateMap<UpdateProfileDto, ApplicationUser>()
+                .ForMember(dest => dest.FirstName, opt => opt.Condition(src => !string.IsNullOrEmpty(src.FirstName)))
+                .ForMember(dest => dest.LastName, opt => opt.Condition(src => !string.IsNullOrEmpty(src.LastName)))
+                .ForMember(dest => dest.MiddleName, opt => opt.Condition(src => !string.IsNullOrEmpty(src.MiddleName)))
+                .ForMember(dest => dest.DisplayName, opt => opt.Condition(src => !string.IsNullOrEmpty(src.DisplayName)))
+                .ForMember(dest => dest.DateOfBirth, opt => opt.Condition(src => src.DateOfBirth.HasValue))
+                .ForMember(dest => dest.Gender, opt => opt.Condition(src => !string.IsNullOrEmpty(src.Gender)))
+                .ForMember(dest => dest.UpdatedAt, opt => opt.MapFrom(src => DateTime.UtcNow))
+                .ForMember(dest => dest.Id, opt => opt.Ignore())
+                .ForMember(dest => dest.UserName, opt => opt.Ignore())
+                .ForMember(dest => dest.NormalizedUserName, opt => opt.Ignore())
+                .ForMember(dest => dest.Email, opt => opt.Ignore())
+                .ForMember(dest => dest.NormalizedEmail, opt => opt.Ignore())
+                .ForMember(dest => dest.EmailConfirmed, opt => opt.Ignore())
+                .ForMember(dest => dest.PasswordHash, opt => opt.Ignore())
+                .ForMember(dest => dest.SecurityStamp, opt => opt.Ignore())
+                .ForMember(dest => dest.ConcurrencyStamp, opt => opt.Ignore())
+                .ForMember(dest => dest.PhoneNumber, opt => opt.Ignore())
+                .ForMember(dest => dest.PhoneNumberConfirmed, opt => opt.Ignore())
+                .ForMember(dest => dest.TwoFactorEnabled, opt => opt.Ignore())
+                .ForMember(dest => dest.LockoutEnd, opt => opt.Ignore())
+                .ForMember(dest => dest.LockoutEnabled, opt => opt.Ignore())
+                .ForMember(dest => dest.AccessFailedCount, opt => opt.Ignore())
+                .ForMember(dest => dest.IsActive, opt => opt.Ignore())
+                .ForMember(dest => dest.IsDeleted, opt => opt.Ignore())
+                .ForMember(dest => dest.DeletedAt, opt => opt.Ignore())
+                .ForMember(dest => dest.LoginAttempts, opt => opt.Ignore())
+                .ForMember(dest => dest.LastLoginAt, opt => opt.Ignore())
+                .ForMember(dest => dest.LastPasswordChangeAt, opt => opt.Ignore())
+                .ForMember(dest => dest.TwoFactorEnabledAt, opt => opt.Ignore())
+                .ForMember(dest => dest.CustomerId, opt => opt.Ignore())
+                .ForMember(dest => dest.CreatedAt, opt => opt.Ignore())
+                .ForMember(dest => dest.CreatedBy, opt => opt.Ignore())
+                .ForMember(dest => dest.UpdatedBy, opt => opt.Ignore());
+
+            // UpdateContactInfoDto -> ApplicationUser (partial update)
+            CreateMap<UpdateContactInfoDto, ApplicationUser>()
+                .ForMember(dest => dest.Email, opt => opt.Condition(src => !string.IsNullOrEmpty(src.Email)))
+                .ForMember(dest => dest.NormalizedEmail, opt => opt.MapFrom(src => src.Email.ToUpperInvariant()))
+                .ForMember(dest => dest.PhoneNumber, opt => opt.Condition(src => !string.IsNullOrEmpty(src.PhoneNumber)))
+                .ForMember(dest => dest.UpdatedAt, opt => opt.MapFrom(src => DateTime.UtcNow))
+                .ForMember(dest => dest.Id, opt => opt.Ignore())
+                .ForMember(dest => dest.UserName, opt => opt.Ignore())
+                .ForMember(dest => dest.NormalizedUserName, opt => opt.Ignore())
+                .ForMember(dest => dest.EmailConfirmed, opt => opt.Ignore())
+                .ForMember(dest => dest.PasswordHash, opt => opt.Ignore())
+                .ForMember(dest => dest.SecurityStamp, opt => opt.Ignore())
+                .ForMember(dest => dest.ConcurrencyStamp, opt => opt.Ignore())
+                .ForMember(dest => dest.PhoneNumberConfirmed, opt => opt.Ignore())
+                .ForMember(dest => dest.TwoFactorEnabled, opt => opt.Ignore())
+                .ForMember(dest => dest.LockoutEnd, opt => opt.Ignore())
+                .ForMember(dest => dest.LockoutEnabled, opt => opt.Ignore())
+                .ForMember(dest => dest.AccessFailedCount, opt => opt.Ignore())
+                .ForMember(dest => dest.FirstName, opt => opt.Ignore())
+                .ForMember(dest => dest.LastName, opt => opt.Ignore())
+                .ForMember(dest => dest.MiddleName, opt => opt.Ignore())
+                .ForMember(dest => dest.DisplayName, opt => opt.Ignore())
+                .ForMember(dest => dest.DateOfBirth, opt => opt.Ignore())
+                .ForMember(dest => dest.Gender, opt => opt.Ignore())
+                .ForMember(dest => dest.IsActive, opt => opt.Ignore())
+                .ForMember(dest => dest.IsDeleted, opt => opt.Ignore())
+                .ForMember(dest => dest.DeletedAt, opt => opt.Ignore())
+                .ForMember(dest => dest.LoginAttempts, opt => opt.Ignore())
+                .ForMember(dest => dest.LastLoginAt, opt => opt.Ignore())
+                .ForMember(dest => dest.LastPasswordChangeAt, opt => opt.Ignore())
+                .ForMember(dest => dest.TwoFactorEnabledAt, opt => opt.Ignore())
+                .ForMember(dest => dest.CustomerId, opt => opt.Ignore())
+                .ForMember(dest => dest.CreatedAt, opt => opt.Ignore())
+                .ForMember(dest => dest.CreatedBy, opt => opt.Ignore())
+                .ForMember(dest => dest.UpdatedBy, opt => opt.Ignore());
+
+            // RegisterUserDto -> ApplicationUser
+            CreateMap<RegisterUserDto, ApplicationUser>()
+                .ForMember(dest => dest.UserName, opt => opt.MapFrom(src => src.Email))
+                .ForMember(dest => dest.NormalizedUserName, opt => opt.MapFrom(src => src.Email.ToUpperInvariant()))
+                .ForMember(dest => dest.NormalizedEmail, opt => opt.MapFrom(src => src.Email.ToUpperInvariant()))
+                .ForMember(dest => dest.EmailConfirmed, opt => opt.MapFrom(src => false))
+                .ForMember(dest => dest.PhoneNumberConfirmed, opt => opt.MapFrom(src => false))
+                .ForMember(dest => dest.TwoFactorEnabled, opt => opt.MapFrom(src => false))
+                .ForMember(dest => dest.LockoutEnabled, opt => opt.MapFrom(src => true))
+                .ForMember(dest => dest.AccessFailedCount, opt => opt.MapFrom(src => 0))
+                .ForMember(dest => dest.IsActive, opt => opt.MapFrom(src => true))
+                .ForMember(dest => dest.IsDeleted, opt => opt.MapFrom(src => false))
+                .ForMember(dest => dest.LoginAttempts, opt => opt.MapFrom(src => 0))
+                .ForMember(dest => dest.CreatedAt, opt => opt.MapFrom(src => DateTime.UtcNow))
+                .ForMember(dest => dest.CustomerId, opt => opt.MapFrom(src => src.CustomerId))
+                .ForMember(dest => dest.Id, opt => opt.Ignore())
+                .ForMember(dest => dest.ConcurrencyStamp, opt => opt.Ignore())
+                .ForMember(dest => dest.SecurityStamp, opt => opt.Ignore())
+                .ForMember(dest => dest.PasswordHash, opt => opt.Ignore())
+                .ForMember(dest => dest.LockoutEnd, opt => opt.Ignore())
+                .ForMember(dest => dest.LastLoginAt, opt => opt.Ignore())
+                .ForMember(dest => dest.LastPasswordChangeAt, opt => opt.Ignore())
+                .ForMember(dest => dest.TwoFactorEnabledAt, opt => opt.Ignore())
+                .ForMember(dest => dest.UpdatedAt, opt => opt.Ignore())
+                .ForMember(dest => dest.DeletedAt, opt => opt.Ignore())
+                .ForMember(dest => dest.CreatedBy, opt => opt.Ignore())
+                .ForMember(dest => dest.UpdatedBy, opt => opt.Ignore());
+        }
+    }
+} 
