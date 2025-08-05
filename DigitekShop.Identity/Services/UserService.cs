@@ -5,9 +5,9 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using DigitekShop.Application.Interfaces.Identity;
-using DigitekShop.Application.Models.Identity;
 using DigitekShop.Identity.Models;
 using DigitekShop.Identity.Context;
+using DigitekShop.Application.DTOs.Identity;
 
 namespace DigitekShop.Identity.Services
 {
@@ -147,28 +147,11 @@ namespace DigitekShop.Identity.Services
                 MiddleName = createUserDto.MiddleName,
                 DateOfBirth = createUserDto.DateOfBirth,
                 Gender = createUserDto.Gender,
-                NationalId = createUserDto.NationalId,
-                PassportNumber = createUserDto.PassportNumber,
                 PhoneNumber = createUserDto.PhoneNumber,
-                Address = createUserDto.Address,
-                City = createUserDto.City,
-                State = createUserDto.State,
-                Country = createUserDto.Country,
-                PostalCode = createUserDto.PostalCode,
-                Bio = createUserDto.Bio,
-                Website = createUserDto.Website,
-                Company = createUserDto.Company,
-                JobTitle = createUserDto.JobTitle,
-                PreferredLanguage = createUserDto.PreferredLanguage,
-                TimeZone = createUserDto.TimeZone,
-                EmailNotifications = createUserDto.EmailNotifications,
-                SmsNotifications = createUserDto.SmsNotifications,
-                PushNotifications = createUserDto.PushNotifications,
                 EmailConfirmed = createUserDto.EmailConfirmed,
                 PhoneNumberConfirmed = createUserDto.PhoneNumberConfirmed,
                 TwoFactorEnabled = createUserDto.TwoFactorEnabled,
                 CustomerId = createUserDto.CustomerId,
-                CustomerNumber = createUserDto.CustomerNumber,
                 CreatedBy = createUserDto.CreatedBy
             };
 
@@ -206,14 +189,7 @@ namespace DigitekShop.Identity.Services
                 PhoneNumber = registerUserDto.PhoneNumber,
                 DateOfBirth = registerUserDto.DateOfBirth,
                 Gender = registerUserDto.Gender,
-                NationalId = registerUserDto.NationalId,
-                Address = registerUserDto.Address,
-                City = registerUserDto.City,
-                State = registerUserDto.State,
-                Country = registerUserDto.Country,
-                PostalCode = registerUserDto.PostalCode,
                 CustomerId = registerUserDto.CustomerId,
-                CustomerNumber = registerUserDto.CustomerNumber,
                 Roles = new List<string> { "Customer" } // Default role for registered users
             };
 
@@ -241,12 +217,6 @@ namespace DigitekShop.Identity.Services
             user.UpdateProfile(updateProfileDto.FirstName, updateProfileDto.LastName, updateProfileDto.MiddleName);
             user.DateOfBirth = updateProfileDto.DateOfBirth;
             user.Gender = updateProfileDto.Gender;
-            user.NationalId = updateProfileDto.NationalId;
-            user.PassportNumber = updateProfileDto.PassportNumber;
-            user.Bio = updateProfileDto.Bio;
-            user.Website = updateProfileDto.Website;
-            user.Company = updateProfileDto.Company;
-            user.JobTitle = updateProfileDto.JobTitle;
 
             var result = await _userManager.UpdateAsync(user);
             if (!result.Succeeded)
@@ -275,52 +245,7 @@ namespace DigitekShop.Identity.Services
             return MapToUserDto(user, roles);
         }
 
-        public async Task<UserDto> UpdateAddressAsync(string userId, UpdateAddressDto updateAddressDto)
-        {
-            var user = await _userManager.FindByIdAsync(userId);
-            if (user == null) return null!;
 
-            user.UpdateAddress(updateAddressDto.Address, updateAddressDto.City, updateAddressDto.State, updateAddressDto.Country, updateAddressDto.PostalCode);
-
-            var result = await _userManager.UpdateAsync(user);
-            if (!result.Succeeded)
-            {
-                throw new Exception($"Failed to update address: {string.Join(", ", result.Errors.Select(e => e.Description))}");
-            }
-
-            var roles = await _userManager.GetRolesAsync(user);
-            return MapToUserDto(user, roles);
-        }
-
-        public async Task<UserDto> UpdatePreferencesAsync(string userId, UpdatePreferencesDto updatePreferencesDto)
-        {
-            var user = await _userManager.FindByIdAsync(userId);
-            if (user == null) return null!;
-
-            user.UpdatePreferences(updatePreferencesDto.PreferredLanguage, updatePreferencesDto.TimeZone, 
-                updatePreferencesDto.EmailNotifications, updatePreferencesDto.SmsNotifications, updatePreferencesDto.PushNotifications);
-
-            var result = await _userManager.UpdateAsync(user);
-            if (!result.Succeeded)
-            {
-                throw new Exception($"Failed to update preferences: {string.Join(", ", result.Errors.Select(e => e.Description))}");
-            }
-
-            var roles = await _userManager.GetRolesAsync(user);
-            return MapToUserDto(user, roles);
-        }
-
-        public async Task<bool> UpdateProfilePictureAsync(string userId, string profilePictureUrl)
-        {
-            var user = await _userManager.FindByIdAsync(userId);
-            if (user == null) return false;
-
-            user.ProfilePictureUrl = profilePictureUrl;
-            user.UpdatedAt = DateTime.UtcNow;
-
-            var result = await _userManager.UpdateAsync(user);
-            return result.Succeeded;
-        }
 
         #endregion
 
@@ -778,12 +703,7 @@ namespace DigitekShop.Identity.Services
             return user == null;
         }
 
-        public async Task<bool> IsNationalIdUniqueAsync(string nationalId)
-        {
-            if (string.IsNullOrEmpty(nationalId)) return true;
-            var user = await _userManager.Users.FirstOrDefaultAsync(u => u.NationalId == nationalId);
-            return user == null;
-        }
+
 
         public async Task<bool> IsPhoneNumberUniqueAsync(string phoneNumber)
         {
@@ -870,43 +790,23 @@ namespace DigitekShop.Identity.Services
                 DateOfBirth = user.DateOfBirth,
                 Age = user.Age,
                 Gender = user.Gender,
-                NationalId = user.NationalId,
-                PassportNumber = user.PassportNumber,
-                Address = user.Address,
-                City = user.City,
-                State = user.State,
-                Country = user.Country,
-                PostalCode = user.PostalCode,
-                ProfilePictureUrl = user.ProfilePictureUrl,
-                Bio = user.Bio,
-                Website = user.Website,
-                Company = user.Company,
-                JobTitle = user.JobTitle,
                 CreatedAt = user.CreatedAt,
                 LastLoginAt = user.LastLoginAt,
                 LastPasswordChangeAt = user.LastPasswordChangeAt,
                 LoginAttempts = user.LoginAttempts,
-                LockoutEnd = user.LockoutEnd,
                 IsActive = user.IsActive,
                 IsDeleted = user.IsDeleted,
                 DeletedAt = user.DeletedAt,
                 EmailConfirmed = user.EmailConfirmed,
                 PhoneNumberConfirmed = user.PhoneNumberConfirmed,
-                PreferredLanguage = user.PreferredLanguage,
-                TimeZone = user.TimeZone,
-                EmailNotifications = user.EmailNotifications,
-                SmsNotifications = user.SmsNotifications,
-                PushNotifications = user.PushNotifications,
                 TwoFactorEnabled = user.TwoFactorEnabled,
                 TwoFactorEnabledAt = user.TwoFactorEnabledAt,
                 CustomerId = user.CustomerId,
-                CustomerNumber = user.CustomerNumber,
                 CreatedBy = user.CreatedBy,
                 UpdatedBy = user.UpdatedBy,
                 UpdatedAt = user.UpdatedAt,
                 IsLocked = user.IsLocked,
                 IsNewUser = user.IsNewUser,
-                HasProfilePicture = user.HasProfilePicture,
                 RequiresPasswordChange = user.RequiresPasswordChange(),
                 IsPasswordExpired = user.IsPasswordExpired(),
                 Roles = roles,

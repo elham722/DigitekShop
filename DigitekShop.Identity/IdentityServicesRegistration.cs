@@ -11,10 +11,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using DigitekShop.Application.Interfaces.Identity;
-using DigitekShop.Application.Models.Identity;
 using DigitekShop.Identity.Models;
 using DigitekShop.Identity.Services;
 using DigitekShop.Identity.Context;
+using DigitekShop.Application.DTOs.Identity;
 
 namespace DigitekShop.Identity
 {
@@ -35,8 +35,10 @@ namespace DigitekShop.Identity
                 .AddEntityFrameworkStores<DigitekShopIdentityDbContext>()
                 .AddDefaultTokenProviders();
 
-            services.AddTransient<IAuthService,AuthService>();
-            services.AddTransient<IUserService,UserService>();
+            services.AddTransient<IAuthService, AuthService>();
+            services.AddTransient<IUserService, UserService>();
+            services.AddTransient<IRoleService, RoleService>();
+            services.AddTransient<IPermissionService, PermissionService>();
 
             services.AddAuthentication(options =>
             {

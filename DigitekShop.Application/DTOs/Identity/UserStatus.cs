@@ -1,4 +1,4 @@
-namespace DigitekShop.Application.Models.Identity
+namespace DigitekShop.Application.DTOs.Identity
 {
     public enum UserStatus
     {

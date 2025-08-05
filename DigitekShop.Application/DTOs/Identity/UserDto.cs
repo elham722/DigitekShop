@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace DigitekShop.Application.Models.Identity
+namespace DigitekShop.Application.DTOs.Identity
 {
     public class UserDto
     {
@@ -20,49 +20,24 @@ namespace DigitekShop.Application.Models.Identity
         public DateTime? DateOfBirth { get; set; }
         public int Age { get; set; }
         public string? Gender { get; set; }
-        public string? NationalId { get; set; }
-        public string? PassportNumber { get; set; }
-
-        // Address Information
-        public string? Address { get; set; }
-        public string? City { get; set; }
-        public string? State { get; set; }
-        public string? Country { get; set; }
-        public string? PostalCode { get; set; }
-
-        // Profile Information
-        public string? ProfilePictureUrl { get; set; }
-        public string? Bio { get; set; }
-        public string? Website { get; set; }
-        public string? Company { get; set; }
-        public string? JobTitle { get; set; }
 
         // Account Information
         public DateTime CreatedAt { get; set; }
         public DateTime? LastLoginAt { get; set; }
         public DateTime? LastPasswordChangeAt { get; set; }
         public int LoginAttempts { get; set; }
-        public DateTime? LockoutEnd { get; set; }
         public bool IsActive { get; set; }
         public bool IsDeleted { get; set; }
         public DateTime? DeletedAt { get; set; }
         public bool EmailConfirmed { get; set; }
         public bool PhoneNumberConfirmed { get; set; }
 
-        // Preferences
-        public string? PreferredLanguage { get; set; }
-        public string? TimeZone { get; set; }
-        public bool EmailNotifications { get; set; }
-        public bool SmsNotifications { get; set; }
-        public bool PushNotifications { get; set; }
-
         // Security
         public bool TwoFactorEnabled { get; set; }
         public DateTime? TwoFactorEnabledAt { get; set; }
 
-        // Integration
+        // Integration with Domain
         public int? CustomerId { get; set; }
-        public string? CustomerNumber { get; set; }
 
         // Audit
         public string? CreatedBy { get; set; }
@@ -72,7 +47,6 @@ namespace DigitekShop.Application.Models.Identity
         // Computed Properties
         public bool IsLocked { get; set; }
         public bool IsNewUser { get; set; }
-        public bool HasProfilePicture { get; set; }
         public bool RequiresPasswordChange { get; set; }
         public bool IsPasswordExpired { get; set; }
 

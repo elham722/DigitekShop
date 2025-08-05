@@ -1,6 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 
-namespace DigitekShop.Application.Models.Identity
+namespace DigitekShop.Application.DTOs.Identity
 {
     public class ChangePasswordDto
     {

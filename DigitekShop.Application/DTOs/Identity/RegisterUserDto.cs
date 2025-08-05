@@ -1,7 +1,7 @@
 using System;
 using System.ComponentModel.DataAnnotations;
 
-namespace DigitekShop.Application.Models.Identity
+namespace DigitekShop.Application.DTOs.Identity
 {
     public class RegisterUserDto
     {
@@ -40,33 +40,16 @@ namespace DigitekShop.Application.Models.Identity
         [StringLength(10)]
         public string? Gender { get; set; }
 
-        [StringLength(20)]
-        public string? NationalId { get; set; }
-
-        // Address Information
-        [StringLength(200)]
-        public string? Address { get; set; }
-
-        [StringLength(50)]
-        public string? City { get; set; }
-
-        [StringLength(50)]
-        public string? State { get; set; }
-
-        [StringLength(50)]
-        public string? Country { get; set; }
-
-        [StringLength(20)]
-        public string? PostalCode { get; set; }
-
         // Terms and Conditions
         public bool AcceptTerms { get; set; }
 
         public bool AcceptMarketing { get; set; }
 
-        // Integration
+        // Integration with Domain
         public int? CustomerId { get; set; }
 
-        public string? CustomerNumber { get; set; }
+        // Role Assignment
+        [StringLength(50)]
+        public string? DefaultRole { get; set; }
     }
 } 

@@ -1,7 +1,7 @@
 using System;
 using System.ComponentModel.DataAnnotations;
 
-namespace DigitekShop.Application.Models.Identity
+namespace DigitekShop.Application.DTOs.Identity
 {
     public class UpdateProfileDto
     {
@@ -20,23 +20,5 @@ namespace DigitekShop.Application.Models.Identity
 
         [StringLength(10)]
         public string? Gender { get; set; }
-
-        [StringLength(20)]
-        public string? NationalId { get; set; }
-
-        [StringLength(20)]
-        public string? PassportNumber { get; set; }
-
-        [StringLength(500)]
-        public string? Bio { get; set; }
-
-        [StringLength(100)]
-        public string? Website { get; set; }
-
-        [StringLength(100)]
-        public string? Company { get; set; }
-
-        [StringLength(100)]
-        public string? JobTitle { get; set; }
     }
 } 

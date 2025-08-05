@@ -40,7 +40,7 @@ namespace DigitekShop.Persistence.Repositories
             return await _context.Customers
                 .Include(c => c.Orders)
                 .Include(c => c.Reviews)
-                .Include(c => c.Wishlists)
+                .Include(c => c.Wishlist)
                 .FirstOrDefaultAsync(c => c.Email.Value == email.Value, cancellationToken);
         }
 
@@ -49,7 +49,7 @@ namespace DigitekShop.Persistence.Repositories
             return await _context.Customers
                 .Include(c => c.Orders)
                 .Include(c => c.Reviews)
-                .Include(c => c.Wishlists)
+                .Include(c => c.Wishlist)
                 .FirstOrDefaultAsync(c => c.Phone.Value == phone.Value, cancellationToken);
         }
 

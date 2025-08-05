@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using DigitekShop.Application.Models.Identity;
+using DigitekShop.Application.DTOs.Identity;
 
 namespace DigitekShop.Application.Interfaces.Identity
 {
@@ -26,9 +26,6 @@ namespace DigitekShop.Application.Interfaces.Identity
         // User Profile Management
         Task<UserDto> UpdateProfileAsync(string userId, UpdateProfileDto updateProfileDto);
         Task<UserDto> UpdateContactInfoAsync(string userId, UpdateContactInfoDto updateContactInfoDto);
-        Task<UserDto> UpdateAddressAsync(string userId, UpdateAddressDto updateAddressDto);
-        Task<UserDto> UpdatePreferencesAsync(string userId, UpdatePreferencesDto updatePreferencesDto);
-        Task<bool> UpdateProfilePictureAsync(string userId, string profilePictureUrl);
 
         // User Status Management
         Task<bool> ActivateUserAsync(string userId);
@@ -46,12 +43,8 @@ namespace DigitekShop.Application.Interfaces.Identity
         Task<string> GeneratePasswordResetTokenAsync(string email);
         Task<bool> ResetPasswordWithTokenAsync(string email, string token, string newPassword);
 
-        // Role Management
+        // User-Role Management (Read-only)
         Task<IEnumerable<string>> GetUserRolesAsync(string userId);
-        Task<bool> AddUserToRoleAsync(string userId, string roleName);
-        Task<bool> RemoveUserFromRoleAsync(string userId, string roleName);
-        Task<bool> AddUserToRolesAsync(string userId, IEnumerable<string> roleNames);
-        Task<bool> RemoveUserFromRolesAsync(string userId, IEnumerable<string> roleNames);
         Task<bool> IsUserInRoleAsync(string userId, string roleName);
 
         // Two-Factor Authentication
@@ -81,7 +74,6 @@ namespace DigitekShop.Application.Interfaces.Identity
         // Validation
         Task<bool> IsEmailUniqueAsync(string email);
         Task<bool> IsUserNameUniqueAsync(string userName);
-        Task<bool> IsNationalIdUniqueAsync(string nationalId);
         Task<bool> IsPhoneNumberUniqueAsync(string phoneNumber);
 
         // Security

@@ -43,34 +43,60 @@ namespace DigitekShop.Application.Features.Customers.Commands.CreateCustomer
 
                 // ایجاد آدرس (اگر ارائه شده)
                 Address? address = null;
-                if (!string.IsNullOrEmpty(command.Street) || !string.IsNullOrEmpty(command.City))
+                if (!string.IsNullOrEmpty(command.Address) || !string.IsNullOrEmpty(command.City))
                 {
                     address = new Address(
                         command.State ?? "",      // Province
                         command.City ?? "",       // City
                         "",                       // District
-                        command.Street ?? "",     // Street
+                        command.Address ?? "",    // Street
                         command.PostalCode ?? "", // PostalCode
                         ""                        // Details
                     );
                 }
 
                 // ایجاد مشتری جدید
-                var customer = new Customer(
+                var customer = Customer.Create(
                     command.FirstName,
                     command.LastName,
-                    command.DateOfBirth,
-                    command.NationalCode,
                     email,
                     phone,
-                    command.ProfileImageUrl,
-                    command.Notes
+                    command.MiddleName,
+                    command.DateOfBirth,
+                    command.NationalCode,
+                    command.Gender,
+                    command.Type
                 );
 
                 // تنظیم آدرس
                 if (address != null)
                 {
                     customer.UpdateAddress(address);
+                }
+
+                // تنظیم اطلاعات پروفایل
+                if (!string.IsNullOrEmpty(command.Bio) || !string.IsNullOrEmpty(command.Website) || 
+                    !string.IsNullOrEmpty(command.Company) || !string.IsNullOrEmpty(command.JobTitle))
+                {
+                    customer.UpdateProfileInfo(
+                        null, // profileImageUrl
+                        command.Bio,
+                        command.Website,
+                        command.Company,
+                        command.JobTitle
+                    );
+                }
+
+                // لینک کردن با User (اگر ارائه شده)
+                if (!string.IsNullOrEmpty(command.UserId))
+                {
+                    customer.LinkToUser(command.UserId);
+                }
+
+                // تنظیم یادداشت‌ها
+                if (!string.IsNullOrEmpty(command.Notes))
+                {
+                    customer.UpdateNotes(command.Notes);
                 }
 
                 // ذخیره در دیتابیس
