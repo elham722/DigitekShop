@@ -8,10 +8,10 @@
 
   <ItemGroup>
     <PackageReference Include="MediatR" Version="13.0.0" />
-    <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="9.0.4" />
-    <PackageReference Include="Swashbuckle.AspNetCore" Version="7.0.0" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="9.0.7" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="9.0.7">
+    <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="9.0.8" />
+    <PackageReference Include="Swashbuckle.AspNetCore" Version="9.0.3" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="9.0.8" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="9.0.8">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
@@ -19,6 +19,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\DigitekShop.Application\DigitekShop.Application.csproj" />
+    <ProjectReference Include="..\DigitekShop.Identity\DigitekShop.Identity.csproj" />
     <ProjectReference Include="..\DigitekShop.Infrastructure\DigitekShop.Infrastructure.csproj" />
     <ProjectReference Include="..\DigitekShop.Persistence\DigitekShop.Persistence.csproj" />
   </ItemGroup>

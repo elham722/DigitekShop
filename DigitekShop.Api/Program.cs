@@ -5,6 +5,7 @@ using DigitekShop.Persistence;
 using DigitekShop.Api.Extensions;
 using DigitekShop.Api.Middleware;
 using DigitekShop.Domain.Services;
+using DigitekShop.Identity;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -19,6 +20,7 @@ builder.Services.AddCorsWithConfiguration(builder.Configuration);
 builder.Services.AddFeatures();
 builder.Services.AddInfrastructureServices(builder.Configuration);
 builder.Services.AddPersistenceServices(builder.Configuration);
+builder.Services.ConfigureIdentityServices(builder.Configuration);
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddSwaggerDocumentation();
 
@@ -43,6 +45,7 @@ if (app.Environment.IsDevelopment())
     app.UseCorsLogging();
 }
 
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
