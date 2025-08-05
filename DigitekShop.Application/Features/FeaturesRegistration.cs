@@ -4,10 +4,11 @@ using DigitekShop.Application.DTOs.Common;
 using DigitekShop.Application.DTOs.Customer;
 using DigitekShop.Application.DTOs.Order;
 using DigitekShop.Application.DTOs.Product;
-using DigitekShop.Application.Responses;
 using DigitekShop.Application.Features.Products.Commands.CreateProduct;
 using DigitekShop.Application.Features.Products.Commands.UpdateProduct;
 using DigitekShop.Application.Features.Products.Commands.DeleteProduct;
+using DigitekShop.Application.Features.Products.Queries.GetProduct;
+using DigitekShop.Application.Features.Products.Queries.GetProducts;
 using DigitekShop.Application.Features.Customers.Commands.CreateCustomer;
 using DigitekShop.Application.Features.Customers.Queries.GetCustomers;
 using DigitekShop.Application.Features.Orders.Commands.CreateOrder;
@@ -33,12 +34,13 @@ namespace DigitekShop.Application.Features
             // UnitOfWork is registered in Infrastructure layer
 
             // Product Commands
-            services.AddScoped<ICommandHandler<CreateProductCommand, CommandResponse<ProductDto>>, CreateProductCommandHandler>();
-            services.AddScoped<ICommandHandler<UpdateProductCommand, CommandResponse<ProductDto>>, UpdateProductCommandHandler>();
-            // Update the registration for DeleteProductCommandHandler to include the correct generic type parameters
-            services.AddScoped<ICommandHandler<DeleteProductCommand, CommandResponse>, DeleteProductCommandHandler>();
+            services.AddScoped<ICommandHandler<CreateProductCommand, ProductDto>, CreateProductCommandHandler>();
+            services.AddScoped<ICommandHandler<UpdateProductCommand, ProductDto>, UpdateProductCommandHandler>();
+            services.AddScoped<ICommandHandler<DeleteProductCommand>, DeleteProductCommandHandler>();
 
-            // Product Queries - MediatR will auto-register these handlers
+            // Product Queries
+            services.AddScoped<IQueryHandler<GetProductQuery, ProductDto>, GetProductQueryHandler>();
+            services.AddScoped<IQueryHandler<GetProductsQuery, PagedResultDto<ProductListDto>>, GetProductsQueryHandler>();
 
             // Customer Commands
             services.AddScoped<ICommandHandler<CreateCustomerCommand, CustomerDto>, CreateCustomerCommandHandler>();

@@ -238,7 +238,7 @@ namespace DigitekShop.Tests.Mocks
         {
             // Arrange
             var mockRepo = new MockProductRepository();
-            var newProduct = new DigitekShop.Domain.Entities.Product(
+            var newProduct = DigitekShop.Domain.Entities.Product.Create(
                 new DigitekShop.Domain.ValueObjects.ProductName("Test Product"),
                 "Test Description",
                 new DigitekShop.Domain.ValueObjects.Money(100000, "IRR"),

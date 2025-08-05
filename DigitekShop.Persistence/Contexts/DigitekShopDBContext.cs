@@ -40,13 +40,10 @@ namespace DigitekShop.Persistence.Contexts
                 {
                     address.Property(a => a.Province).HasColumnName("Province").IsRequired();
                     address.Property(a => a.City).HasColumnName("City").IsRequired();
-                    address.Property(a => a.District).HasColumnName("District").IsRequired();
-                    address.Property(a => a.Street).HasColumnName("Street").IsRequired();
-                    address.Property(a => a.Alley).HasColumnName("Alley");
-                    address.Property(a => a.Building).HasColumnName("Building");
-                    address.Property(a => a.Unit).HasColumnName("Unit");
+                    address.Property(a => a.District).HasColumnName("District");
+                    address.Property(a => a.Street).HasColumnName("Street");
                     address.Property(a => a.PostalCode).HasColumnName("PostalCode");
-                    address.Property(a => a.Description).HasColumnName("Description");
+                    address.Property(a => a.Details).HasColumnName("Details");
                 });
 
                 // Configure Email as owned entity type
@@ -119,13 +116,10 @@ namespace DigitekShop.Persistence.Contexts
                 {
                     address.Property(a => a.Province).HasColumnName("ShippingProvince").IsRequired();
                     address.Property(a => a.City).HasColumnName("ShippingCity").IsRequired();
-                    address.Property(a => a.District).HasColumnName("ShippingDistrict").IsRequired();
-                    address.Property(a => a.Street).HasColumnName("ShippingStreet").IsRequired();
-                    address.Property(a => a.Alley).HasColumnName("ShippingAlley");
-                    address.Property(a => a.Building).HasColumnName("ShippingBuilding");
-                    address.Property(a => a.Unit).HasColumnName("ShippingUnit");
+                    address.Property(a => a.District).HasColumnName("ShippingDistrict");
+                    address.Property(a => a.Street).HasColumnName("ShippingStreet");
                     address.Property(a => a.PostalCode).HasColumnName("ShippingPostalCode");
-                    address.Property(a => a.Description).HasColumnName("ShippingDescription");
+                    address.Property(a => a.Details).HasColumnName("ShippingDetails");
                 });
 
                 // Configure Billing Address as owned entity type
@@ -133,13 +127,10 @@ namespace DigitekShop.Persistence.Contexts
                 {
                     address.Property(a => a.Province).HasColumnName("BillingProvince").IsRequired();
                     address.Property(a => a.City).HasColumnName("BillingCity").IsRequired();
-                    address.Property(a => a.District).HasColumnName("BillingDistrict").IsRequired();
-                    address.Property(a => a.Street).HasColumnName("BillingStreet").IsRequired();
-                    address.Property(a => a.Alley).HasColumnName("BillingAlley");
-                    address.Property(a => a.Building).HasColumnName("BillingBuilding");
-                    address.Property(a => a.Unit).HasColumnName("BillingUnit");
+                    address.Property(a => a.District).HasColumnName("BillingDistrict");
+                    address.Property(a => a.Street).HasColumnName("BillingStreet");
                     address.Property(a => a.PostalCode).HasColumnName("BillingPostalCode");
-                    address.Property(a => a.Description).HasColumnName("BillingDescription");
+                    address.Property(a => a.Details).HasColumnName("BillingDetails");
                 });
 
                 // Configure TotalAmount as owned entity type

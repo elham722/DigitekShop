@@ -4,10 +4,11 @@ using System.Linq;
 using DigitekShop.Domain.Entities.Common;
 using DigitekShop.Domain.ValueObjects;
 using DigitekShop.Domain.Enums;
+using DigitekShop.Domain.Events;
 
 namespace DigitekShop.Domain.Entities
 {
-    public class Order : BaseEntity
+    public class Order : BaseAggregateRoot
     {
         public OrderNumber OrderNumber { get; private set; }
         public int CustomerId { get; private set; }
@@ -32,34 +33,35 @@ namespace DigitekShop.Domain.Entities
         public ICollection<OrderItem> OrderItems { get; private set; }
 
         // Constructor
-
         private Order()
         {
             OrderItems = new List<OrderItem>();
         }
 
-        public Order(int customerId, Address shippingAddress, Address billingAddress, 
+        public static Order Create(int customerId, Address shippingAddress, Address billingAddress, 
             PaymentMethod paymentMethod, string shippingMethod = "Standard")
         {
-            CustomerId = customerId;
-            ShippingAddress = shippingAddress;
-            BillingAddress = billingAddress;
-            PaymentMethod = paymentMethod;
-            ShippingMethod = shippingMethod;
-            Status = OrderStatus.Pending;
+            var order = new Order
+            {
+                CustomerId = customerId,
+                ShippingAddress = shippingAddress,
+                BillingAddress = billingAddress,
+                PaymentMethod = paymentMethod,
+                ShippingMethod = shippingMethod,
+                Status = OrderStatus.Pending,
+                OrderNumber = OrderNumber.Generate(),
+                TotalAmount = new Money(0),
+                ShippingCost = new Money(0),
+                TaxAmount = new Money(0),
+                DiscountAmount = new Money(0),
+                FinalAmount = new Money(0),
+                OrderItems = new List<OrderItem>()
+            };
+
+            order.SetUpdated();
+            order.AddDomainEvent(new OrderCreatedEvent(order));
             
-            // تولید شماره سفارش
-            OrderNumber = OrderNumber.Generate();
-            
-            // مقداردهی اولیه
-            TotalAmount = new Money(0);
-            ShippingCost = new Money(0);
-            TaxAmount = new Money(0);
-            DiscountAmount = new Money(0);
-            FinalAmount = new Money(0);
-            
-            OrderItems = new List<OrderItem>();
-            SetUpdated();
+            return order;
         }
 
         // Business Methods
@@ -84,8 +86,12 @@ namespace DigitekShop.Domain.Entities
             }
         }
 
-        public void UpdateStatus(OrderStatus newStatus)
+        public void UpdateStatus(OrderStatus newStatus, string changedBy = "System", string reason = "")
         {
+            if (Status == newStatus)
+                return;
+
+            var oldStatus = Status;
             Status = newStatus;
             
             // ثبت زمان‌های مهم
@@ -95,6 +101,9 @@ namespace DigitekShop.Domain.Entities
                 DeliveredAt = DateTime.UtcNow;
                 
             SetUpdated();
+            
+            // اضافه کردن Domain Event
+            AddDomainEvent(new OrderStatusChangedEvent(this, oldStatus, newStatus, changedBy, reason));
         }
 
         public void SetShippingCost(Money cost)

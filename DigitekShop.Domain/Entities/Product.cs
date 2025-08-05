@@ -6,10 +6,11 @@ using System.Threading.Tasks;
 using DigitekShop.Domain.Entities.Common;
 using DigitekShop.Domain.ValueObjects;
 using DigitekShop.Domain.Enums;
+using DigitekShop.Domain.Events;
 
 namespace DigitekShop.Domain.Entities
 {
-    public class Product : BaseEntity
+    public class Product : BaseAggregateRoot
     {
         public ProductName Name { get; private set; }
         public string Description { get; private set; }
@@ -31,31 +32,42 @@ namespace DigitekShop.Domain.Entities
         // Constructor
         private Product() { } // برای EF Core
 
-        public Product(ProductName name, string description, Money price, int stockQuantity,
+        public static Product Create(ProductName name, string description, Money price, int stockQuantity,
             SKU sku, int categoryId, int? brandId = null, string model = "", decimal weight = 0)
         {
-            Name = name;
-            Description = description ?? "";
-            Price = price;
-            StockQuantity = stockQuantity;
-            SKU = sku;
-            CategoryId = categoryId;
-            BrandId = brandId;
-            Model = model ?? "";
-            Weight = weight;
-            Status = ProductStatus.Active;
-            SetUpdated();
+            var product = new Product
+            {
+                Name = name,
+                Description = description ?? "",
+                Price = price,
+                StockQuantity = stockQuantity,
+                SKU = sku,
+                CategoryId = categoryId,
+                BrandId = brandId,
+                Model = model ?? "",
+                Weight = weight,
+                Status = ProductStatus.Active
+            };
+
+            product.SetUpdated();
+            product.AddDomainEvent(new ProductCreatedEvent(product));
+            
+            return product;
         }
 
         // Business Methods
-        public void UpdateStock(int newQuantity)
+        public void UpdateStock(int newQuantity, string reason = "", string changedBy = "System")
         {
             if (newQuantity < 0)
                 throw new ArgumentException("Stock quantity cannot be negative");
 
+            var oldQuantity = StockQuantity;
             StockQuantity = newQuantity;
             UpdateStatus();
             SetUpdated();
+            
+            // اضافه کردن Domain Event
+            AddDomainEvent(new ProductStockUpdatedEvent(this, oldQuantity, newQuantity, reason, changedBy));
         }
 
         public void UpdatePrice(Money newPrice)
@@ -140,16 +152,17 @@ namespace DigitekShop.Domain.Entities
         
         public string GetFullName() => $"{Brand?.Name.Value ?? ""} {Model}".Trim();
 
-        public decimal GetAverageRating()
+        public Rating GetAverageRating()
         {
             if (Reviews == null || !Reviews.Any())
-                return 0;
+                return new Rating(0);
 
             var approvedReviews = Reviews.Where(r => r.IsApproved).ToList();
             if (!approvedReviews.Any())
-                return 0;
+                return new Rating(0);
 
-            return (decimal)Math.Round(approvedReviews.Average(r => r.Rating), 1);
+            var ratings = approvedReviews.Select(r => r.Rating);
+            return Rating.CalculateAverage(ratings);
         }
 
         public int GetReviewCount()
@@ -160,6 +173,12 @@ namespace DigitekShop.Domain.Entities
         public IEnumerable<Review> GetApprovedReviews()
         {
             return Reviews?.Where(r => r.IsApproved).OrderByDescending(r => r.CreatedAt) ?? Enumerable.Empty<Review>();
+        }
+
+        // برای backward compatibility
+        public decimal GetAverageRatingDecimal()
+        {
+            return GetAverageRating().Value;
         }
     }
 }

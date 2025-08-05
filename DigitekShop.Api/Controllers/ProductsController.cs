@@ -78,14 +78,14 @@ namespace DigitekShop.Api.Controllers
                 var query = new GetProductQuery { Id = id };
                 var result = await QueryDispatcher.DispatchAsync(query);
                 
-                if (result == null || result.Data == null)
+                if (result == null)
                 {
                     _logger.LogWarning("Product with ID {ProductId} not found", id);
                     return NotFound(new ErrorResponse("محصول مورد نظر یافت نشد"));
                 }
                 
-                _logger.LogInformation("Retrieved product: {ProductName}", result.Data.Name);
-                return Ok(result.Data);
+                _logger.LogInformation("Retrieved product: {ProductName}", result.Name);
+                return Ok(result);
             }
             catch (ProductNotFoundException ex)
             {
@@ -116,15 +116,15 @@ namespace DigitekShop.Api.Controllers
                 
                 var result = await CommandDispatcher.DispatchAsync(command);
                 
-                if (result == null || result.Data == null)
+                if (result == null)
                 {
                     _logger.LogError("Failed to create product - no data returned");
                     return StatusCode(500, new ErrorResponse("خطا در ایجاد محصول"));
                 }
                 
-                _logger.LogInformation("Product created successfully with ID: {ProductId}", result.Data.Id);
+                _logger.LogInformation("Product created successfully with ID: {ProductId}", result.Id);
                 
-                return CreatedAtAction(nameof(GetProduct), new { id = result.Data.Id }, result.Data);
+                return CreatedAtAction(nameof(GetProduct), new { id = result.Id }, result);
             }
             catch (ValidationException ex)
             {
@@ -178,14 +178,14 @@ namespace DigitekShop.Api.Controllers
                 
                 var result = await CommandDispatcher.DispatchAsync(command);
                 
-                if (result == null || result.Data == null)
+                if (result == null)
                 {
                     _logger.LogWarning("Product with ID {ProductId} not found for update", id);
                     return NotFound(new ErrorResponse("محصول مورد نظر یافت نشد"));
                 }
                 
-                _logger.LogInformation("Product updated successfully: {ProductName}", result.Data.Name);
-                return Ok(result.Data);
+                _logger.LogInformation("Product updated successfully: {ProductName}", result.Name);
+                return Ok(result);
             }
             catch (ValidationException ex)
             {

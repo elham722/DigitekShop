@@ -25,7 +25,7 @@ namespace DigitekShop.Domain.Aggregates
         public static OrderAggregate Create(int customerId, Address shippingAddress, Address billingAddress, 
             PaymentMethod paymentMethod, string shippingMethod = "Standard")
         {
-            var order = new Order(customerId, shippingAddress, billingAddress, paymentMethod, shippingMethod);
+            var order = Order.Create(customerId, shippingAddress, billingAddress, paymentMethod, shippingMethod);
             var aggregate = new OrderAggregate(order);
             
             // اضافه کردن event
@@ -67,10 +67,10 @@ namespace DigitekShop.Domain.Aggregates
             }
 
             // کاهش موجودی محصول
-            product.UpdateStock(product.StockQuantity - quantity);
+            var oldQuantity = product.StockQuantity;
+            product.UpdateStock(product.StockQuantity - quantity, "Order item added", "System");
             
-            AddDomainEvent(new ProductStockUpdatedEvent(product.Id, product.Name.Value, product.SKU.Value, 
-                product.StockQuantity + quantity, product.StockQuantity));
+            AddDomainEvent(new ProductStockUpdatedEvent(product, oldQuantity, product.StockQuantity, "Order item added", "System"));
         }
 
         public void RemoveOrderItem(int productId)
@@ -85,7 +85,7 @@ namespace DigitekShop.Domain.Aggregates
             // بازگرداندن موجودی محصول
             // اینجا باید Product را از repository دریافت کنیم
             // برای حال حاضر فقط event را اضافه می‌کنیم
-            AddDomainEvent(new ProductStockUpdatedEvent(productId, "", "", 0, quantity));
+            // AddDomainEvent(new ProductStockUpdatedEvent(productId, "", "", 0, quantity));
         }
 
         public void UpdateOrderStatus(OrderStatus newStatus)
@@ -99,10 +99,9 @@ namespace DigitekShop.Domain.Aggregates
             if (!CanChangeStatus(oldStatus, newStatus))
                 throw new InvalidOrderStatusException(Order.Id, oldStatus, newStatus);
 
-            Order.UpdateStatus(newStatus);
+            Order.UpdateStatus(newStatus, "System", "Status updated");
             
-            AddDomainEvent(new OrderStatusChangedEvent(Order.Id, Order.CustomerId, Order.OrderNumber.Value, 
-                oldStatus, newStatus));
+            AddDomainEvent(new OrderStatusChangedEvent(Order, oldStatus, newStatus, "System", "Status updated"));
         }
 
         public void ApplyDiscount(Money discountAmount)
@@ -170,7 +169,7 @@ namespace DigitekShop.Domain.Aggregates
             // بازگرداندن موجودی محصولات
             foreach (var item in Order.OrderItems)
             {
-                AddDomainEvent(new ProductStockUpdatedEvent(item.ProductId, "", "", 0, item.Quantity));
+                // AddDomainEvent(new ProductStockUpdatedEvent(item.ProductId, "", "", 0, item.Quantity));
             }
         }
 

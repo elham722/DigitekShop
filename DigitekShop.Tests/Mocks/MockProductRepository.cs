@@ -32,7 +32,7 @@ namespace DigitekShop.Tests.Mocks
             // Add some sample products for testing
             var products = new[]
             {
-                new Product(
+                Product.Create(
                     new ProductName("iPhone 15"),
                     "گوشی هوشمند اپل آیفون 15",
                     new Money(85000000, "IRR"),
@@ -43,7 +43,7 @@ namespace DigitekShop.Tests.Mocks
                     "iPhone 15",
                     0.2m
                 ),
-                new Product(
+                Product.Create(
                     new ProductName("MacBook Air"),
                     "لپ تاپ اپل مک بوک ایر",
                     new Money(75000000, "IRR"),
@@ -54,7 +54,7 @@ namespace DigitekShop.Tests.Mocks
                     "MacBook Air",
                     1.3m
                 ),
-                new Product(
+                Product.Create(
                     new ProductName("AirPods Pro"),
                     "هدفون بی‌سیم اپل ایرپادز پرو",
                     new Money(8500000, "IRR"),
@@ -168,7 +168,7 @@ namespace DigitekShop.Tests.Mocks
         {
             await Task.Delay(1, cancellationToken);
             var product = _products.FirstOrDefault(p => p.Id == productId);
-            return product?.GetAverageRating() ?? 0;
+            return product?.GetAverageRating().Value ?? 0;
         }
 
         public async Task<int> GetReviewCountAsync(int productId, CancellationToken cancellationToken = default)

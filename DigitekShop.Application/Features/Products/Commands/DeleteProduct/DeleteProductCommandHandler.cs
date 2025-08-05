@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace DigitekShop.Application.Features.Products.Commands.DeleteProduct
 {
-    public class DeleteProductCommandHandler : ICommandHandler<DeleteProductCommand, CommandResponse>
+    public class DeleteProductCommandHandler : ICommandHandler<DeleteProductCommand>
     {
         private readonly IUnitOfWork _unitOfWork;
         // private readonly IOrderRepository _orderRepository; // اگر نیاز به چک سفارش فعال دارید

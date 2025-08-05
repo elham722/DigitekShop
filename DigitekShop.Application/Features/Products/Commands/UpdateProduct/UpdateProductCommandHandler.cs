@@ -1,7 +1,6 @@
 using DigitekShop.Application.DTOs.Product;
 using DigitekShop.Application.Interfaces;
 using DigitekShop.Application.Profiles;
-using DigitekShop.Application.Responses;
 using DigitekShop.Domain.Entities;
 using DigitekShop.Domain.Interfaces;
 using DigitekShop.Domain.ValueObjects;
@@ -10,7 +9,7 @@ using AutoMapper;
 
 namespace DigitekShop.Application.Features.Products.Commands.UpdateProduct
 {
-    public class UpdateProductCommandHandler : ICommandHandler<UpdateProductCommand, CommandResponse<ProductDto>>
+    public class UpdateProductCommandHandler : ICommandHandler<UpdateProductCommand, ProductDto>
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
@@ -23,7 +22,7 @@ namespace DigitekShop.Application.Features.Products.Commands.UpdateProduct
             _mapper = mapper;
         }
 
-        public async Task<CommandResponse<ProductDto>> HandleAsync(UpdateProductCommand command, CancellationToken cancellationToken = default)
+        public async Task<ProductDto> HandleAsync(UpdateProductCommand command, CancellationToken cancellationToken = default)
         {
             try
             {
@@ -49,11 +48,18 @@ namespace DigitekShop.Application.Features.Products.Commands.UpdateProduct
                 }
 
                 // به‌روزرسانی اطلاعات محصول
-                var productName = new ProductName(command.Name);
-                var price = new Money(command.Price);
+                if (!string.IsNullOrEmpty(command.Name))
+                {
+                    var productName = new ProductName(command.Name);
+                    product.UpdateName(productName);
+                }
 
-                product.UpdateName(productName);
-                product.UpdateDescription(command.Description);
+                if (!string.IsNullOrEmpty(command.Description))
+                {
+                    product.UpdateDescription(command.Description);
+                }
+
+                var price = new Money(command.Price, "IRR");
                 product.UpdatePrice(price);
                 product.UpdateStock(command.StockQuantity);
 
@@ -72,13 +78,8 @@ namespace DigitekShop.Application.Features.Products.Commands.UpdateProduct
                 // تایید تراکنش
                 await _unitOfWork.CommitTransactionAsync(cancellationToken);
 
-                // تبدیل به DTO و ایجاد Response
-                var productDto = _mapper.Map<ProductDto>(product);
-                return ResponseFactory.CreateCommandWithDataAndId(
-                    productDto, 
-                    product.Id, 
-                    "UpdateProduct", 
-                    "Product updated successfully");
+                // تبدیل به DTO و بازگشت
+                return _mapper.Map<ProductDto>(product);
             }
             catch
             {

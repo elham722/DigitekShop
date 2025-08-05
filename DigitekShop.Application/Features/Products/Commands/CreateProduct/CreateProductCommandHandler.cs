@@ -12,7 +12,7 @@ using AutoMapper;
 
 namespace DigitekShop.Application.Features.Products.Commands.CreateProduct
 {
-    public class CreateProductCommandHandler : ICommandHandler<CreateProductCommand, CommandResponse<ProductDto>>
+    public class CreateProductCommandHandler : ICommandHandler<CreateProductCommand, ProductDto>
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
@@ -28,7 +28,7 @@ namespace DigitekShop.Application.Features.Products.Commands.CreateProduct
             _validationService = validationService;
         }
 
-        public async Task<CommandResponse<ProductDto>> HandleAsync(CreateProductCommand command, CancellationToken cancellationToken = default)
+        public async Task<ProductDto> HandleAsync(CreateProductCommand command, CancellationToken cancellationToken = default)
         {
             // اعتبارسنجی Command
             var validationResult = await _validationService.ValidateAsync(command);
@@ -47,10 +47,11 @@ namespace DigitekShop.Application.Features.Products.Commands.CreateProduct
                 if (category == null)
                     throw new CategoryNotFoundException(command.CategoryId);
 
-                // بررسی وجود برند (اگر مشخص شده)
+                // بررسی وجود برند (اگر مشخص شده باشد)
+                Brand? brand = null;
                 if (command.BrandId.HasValue)
                 {
-                    var brand = await _unitOfWork.Brands.GetByIdAsync(command.BrandId.Value);
+                    brand = await _unitOfWork.Brands.GetByIdAsync(command.BrandId.Value);
                     if (brand == null)
                         throw new BrandNotFoundException(command.BrandId.Value);
                 }
@@ -62,11 +63,11 @@ namespace DigitekShop.Application.Features.Products.Commands.CreateProduct
 
                 // ایجاد Value Objects
                 var productName = new ProductName(command.Name);
-                var price = new Money(command.Price);
+                var price = new Money(command.Price, "IRR");
                 var sku = new SKU(command.SKU);
 
-                // ایجاد محصول جدید
-                var product = new Product(
+                // ایجاد محصول با استفاده از Product.Create()
+                var product = Product.Create(
                     productName,
                     command.Description,
                     price,
@@ -78,26 +79,23 @@ namespace DigitekShop.Application.Features.Products.Commands.CreateProduct
                     command.Weight
                 );
 
-                // تنظیم تصویر
+                // تنظیم تصویر (اگر وجود داشته باشد)
                 if (!string.IsNullOrEmpty(command.ImageUrl))
                 {
                     product.UpdateImageUrl(command.ImageUrl);
                 }
 
-                // ذخیره در دیتابیس
+                // ذخیره محصول
                 var createdProduct = await _unitOfWork.Products.AddAsync(product);
+
+                // ذخیره تغییرات
                 await _unitOfWork.SaveChangesAsync(cancellationToken);
 
                 // تایید تراکنش
                 await _unitOfWork.CommitTransactionAsync(cancellationToken);
 
-                // تبدیل به DTO و ایجاد Response
-                var productDto = _mapper.Map<ProductDto>(createdProduct);
-                return ResponseFactory.CreateCommandWithDataAndId(
-                    productDto, 
-                    createdProduct.Id, 
-                    "CreateProduct", 
-                    "Product created successfully");
+                // تبدیل به DTO و بازگشت
+                return _mapper.Map<ProductDto>(createdProduct);
             }
             catch
             {

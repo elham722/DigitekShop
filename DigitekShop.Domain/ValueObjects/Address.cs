@@ -1,5 +1,6 @@
 using System;
 using System.Linq;
+using System.Text.RegularExpressions;
 
 namespace DigitekShop.Domain.ValueObjects
 {
@@ -9,14 +10,11 @@ namespace DigitekShop.Domain.ValueObjects
         public string City { get; private set; }
         public string District { get; private set; }
         public string Street { get; private set; }
-        public string Alley { get; private set; }
-        public string Building { get; private set; }
-        public string Unit { get; private set; }
         public string PostalCode { get; private set; }
-        public string Description { get; private set; }
+        public string Details { get; private set; }
 
-        public Address(string province, string city, string district, string street, 
-            string alley = "", string building = "", string unit = "", string postalCode = "", string description = "")
+        public Address(string province, string city, string district = "", string street = "", 
+            string postalCode = "", string details = "")
         {
             if (string.IsNullOrWhiteSpace(province))
                 throw new ArgumentException("Province cannot be empty");
@@ -24,21 +22,25 @@ namespace DigitekShop.Domain.ValueObjects
             if (string.IsNullOrWhiteSpace(city))
                 throw new ArgumentException("City cannot be empty");
 
-            if (string.IsNullOrWhiteSpace(district))
-                throw new ArgumentException("District cannot be empty");
-
-            if (string.IsNullOrWhiteSpace(street))
-                throw new ArgumentException("Street cannot be empty");
-
             Province = province.Trim();
             City = city.Trim();
-            District = district.Trim();
-            Street = street.Trim();
-            Alley = alley?.Trim() ?? "";
-            Building = building?.Trim() ?? "";
-            Unit = unit?.Trim() ?? "";
+            District = district?.Trim() ?? "";
+            Street = street?.Trim() ?? "";
             PostalCode = postalCode?.Trim() ?? "";
-            Description = description?.Trim() ?? "";
+            Details = details?.Trim() ?? "";
+
+            if (!string.IsNullOrWhiteSpace(PostalCode) && !IsValidPostalCode(PostalCode))
+                throw new ArgumentException("Invalid postal code format");
+        }
+
+        private static bool IsValidPostalCode(string postalCode)
+        {
+            if (string.IsNullOrWhiteSpace(postalCode))
+                return true;
+
+            // فرمت کد پستی ایران: 10 رقم
+            var pattern = @"^\d{10}$";
+            return Regex.IsMatch(postalCode, pattern);
         }
 
         public string GetFullAddress()
@@ -49,36 +51,27 @@ namespace DigitekShop.Domain.ValueObjects
                 City,
                 District,
                 Street,
-                Alley,
-                Building,
-                Unit
-            }.Where(p => !string.IsNullOrWhiteSpace(p));
+                Details
+            };
 
-            return string.Join("، ", parts);
+            return string.Join("، ", parts.Where(p => !string.IsNullOrWhiteSpace(p)));
         }
 
         public string GetShortAddress()
         {
-            return $"{City}، {District}";
+            return $"{City}، {Province}";
         }
 
         public bool IsComplete()
         {
-            return !string.IsNullOrWhiteSpace(Province) &&
-                   !string.IsNullOrWhiteSpace(City) &&
-                   !string.IsNullOrWhiteSpace(District) &&
+            return !string.IsNullOrWhiteSpace(Province) && 
+                   !string.IsNullOrWhiteSpace(City) && 
                    !string.IsNullOrWhiteSpace(Street);
         }
 
-        public bool HasPostalCode()
-        {
-            return !string.IsNullOrWhiteSpace(PostalCode);
-        }
+        public bool HasPostalCode() => !string.IsNullOrWhiteSpace(PostalCode);
 
-        public bool IsInTehran()
-        {
-            return Province.Equals("تهران", StringComparison.OrdinalIgnoreCase);
-        }
+        public bool IsInTehran() => Province.Equals("تهران", StringComparison.OrdinalIgnoreCase);
 
         public bool IsInMajorCity()
         {
@@ -96,16 +89,14 @@ namespace DigitekShop.Domain.ValueObjects
                        City == other.City &&
                        District == other.District &&
                        Street == other.Street &&
-                       Alley == other.Alley &&
-                       Building == other.Building &&
-                       Unit == other.Unit;
+                       PostalCode == other.PostalCode;
             }
             return false;
         }
 
         public override int GetHashCode()
         {
-            return HashCode.Combine(Province, City, District, Street, Alley, Building, Unit);
+            return HashCode.Combine(Province, City, District, Street, PostalCode);
         }
     }
 } 

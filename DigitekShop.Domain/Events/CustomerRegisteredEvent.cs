@@ -1,22 +1,26 @@
 using System;
+using DigitekShop.Domain.Entities;
 
 namespace DigitekShop.Domain.Events
 {
-    public class CustomerRegisteredEvent : IDomainEvent
+    public class CustomerRegisteredEvent : BaseDomainEvent
     {
         public int CustomerId { get; }
         public string FullName { get; }
         public string Email { get; }
         public string Phone { get; }
-        public DateTime OccurredOn { get; }
+        public string NationalCode { get; }
+        public DateTime? DateOfBirth { get; }
 
-        public CustomerRegisteredEvent(int customerId, string fullName, string email, string phone)
+        public CustomerRegisteredEvent(Customer customer)
+            : base("Customer", customer.Id.ToString())
         {
-            CustomerId = customerId;
-            FullName = fullName;
-            Email = email;
-            Phone = phone;
-            OccurredOn = DateTime.UtcNow;
+            CustomerId = customer.Id;
+            FullName = customer.GetFullName();
+            Email = customer.Email.Value;
+            Phone = customer.Phone.Value;
+            NationalCode = customer.NationalCode;
+            DateOfBirth = customer.DateOfBirth;
         }
     }
 } 

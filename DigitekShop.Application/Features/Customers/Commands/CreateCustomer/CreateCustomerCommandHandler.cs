@@ -46,11 +46,12 @@ namespace DigitekShop.Application.Features.Customers.Commands.CreateCustomer
                 if (!string.IsNullOrEmpty(command.Street) || !string.IsNullOrEmpty(command.City))
                 {
                     address = new Address(
-                        command.Street ?? "",
-                        command.City ?? "",
-                        command.State ?? "",
-                        command.PostalCode ?? "",
-                        command.Country ?? ""
+                        command.State ?? "",      // Province
+                        command.City ?? "",       // City
+                        "",                       // District
+                        command.Street ?? "",     // Street
+                        command.PostalCode ?? "", // PostalCode
+                        ""                        // Details
                     );
                 }
 

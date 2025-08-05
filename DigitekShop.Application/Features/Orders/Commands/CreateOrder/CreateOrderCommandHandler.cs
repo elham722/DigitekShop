@@ -44,23 +44,25 @@ namespace DigitekShop.Application.Features.Orders.Commands.CreateOrder
 
                 // ایجاد آدرس‌ها
                 var shippingAddress = new Address(
-                    command.ShippingStreet,
-                    command.ShippingCity,
-                    command.ShippingState,
-                    command.ShippingPostalCode,
-                    command.ShippingCountry
+                    command.ShippingState, // Province
+                    command.ShippingCity,  // City
+                    "",                    // District
+                    command.ShippingStreet, // Street
+                    command.ShippingPostalCode, // PostalCode
+                    ""                     // Details
                 );
 
                 var billingAddress = new Address(
-                    command.BillingStreet,
-                    command.BillingCity,
-                    command.BillingState,
-                    command.BillingPostalCode,
-                    command.BillingCountry
+                    command.BillingState,   // Province
+                    command.BillingCity,    // City
+                    "",                     // District
+                    command.BillingStreet,  // Street
+                    command.BillingPostalCode, // PostalCode
+                    ""                      // Details
                 );
 
-                // ایجاد سفارش
-                var order = new Order(
+                // ایجاد سفارش با استفاده از Order.Create()
+                var order = Order.Create(
                     command.CustomerId,
                     shippingAddress,
                     billingAddress,
@@ -73,6 +75,10 @@ namespace DigitekShop.Application.Features.Orders.Commands.CreateOrder
                 {
                     order.UpdateNotes(command.Notes);
                 }
+
+                // ذخیره سفارش اولیه برای دریافت ID
+                var createdOrder = await _unitOfWork.Orders.AddAsync(order);
+                await _unitOfWork.SaveChangesAsync(cancellationToken);
 
                 // اضافه کردن آیتم‌های سفارش و کاهش موجودی
                 foreach (var itemDto in command.OrderItems)
@@ -92,16 +98,16 @@ namespace DigitekShop.Application.Features.Orders.Commands.CreateOrder
 
                     // ایجاد OrderItem
                     var orderItem = new OrderItem(
-                        order.Id,
+                        createdOrder.Id,
                         itemDto.ProductId,
                         itemDto.Quantity,
-                        new Money(itemDto.UnitPrice)
+                        new Money(itemDto.UnitPrice, "IRR")
                     );
 
-                    order.AddOrderItem(orderItem);
+                    createdOrder.AddOrderItem(orderItem);
 
                     // کاهش موجودی محصول
-                    product.UpdateStock(product.StockQuantity - itemDto.Quantity);
+                    product.UpdateStock(product.StockQuantity - itemDto.Quantity, "Order creation", "System");
                     
                     // به‌روزرسانی محصول در UnitOfWork
                     await _unitOfWork.Products.UpdateAsync(product);
@@ -110,16 +116,13 @@ namespace DigitekShop.Application.Features.Orders.Commands.CreateOrder
                 // محاسبه هزینه‌های اضافی
                 var shippingCost = _orderDomainService.CalculateShippingCost(
                     shippingAddress, 
-                    order.OrderItems, 
+                    createdOrder.OrderItems, 
                     command.ShippingMethod);
-                order.SetShippingCost(shippingCost);
+                createdOrder.SetShippingCost(shippingCost);
 
                 // محاسبه مالیات بر اساس کل مبلغ سفارش
-                var taxAmount = _orderDomainService.CalculateTaxAmount(order.TotalAmount);
-                order.SetTaxAmount(taxAmount);
-
-                // ذخیره سفارش
-                var createdOrder = await _unitOfWork.Orders.AddAsync(order);
+                var taxAmount = _orderDomainService.CalculateTaxAmount(createdOrder.TotalAmount);
+                createdOrder.SetTaxAmount(taxAmount);
 
                 // ذخیره همه تغییرات
                 await _unitOfWork.SaveChangesAsync(cancellationToken);

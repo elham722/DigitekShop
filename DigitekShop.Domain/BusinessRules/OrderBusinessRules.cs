@@ -2,198 +2,157 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using DigitekShop.Domain.Entities;
-using DigitekShop.Domain.ValueObjects;
 using DigitekShop.Domain.Enums;
+using DigitekShop.Domain.ValueObjects;
 
 namespace DigitekShop.Domain.BusinessRules
 {
-    public class OrderBusinessRules
+    public class OrderMustHaveItemsRule : BaseBusinessRule
     {
-        public class OrderMustHaveItemsRule : IBusinessRule
+        private readonly ICollection<OrderItem> _orderItems;
+
+        public OrderMustHaveItemsRule(ICollection<OrderItem> orderItems)
         {
-            private readonly ICollection<OrderItem> _orderItems;
-
-            public OrderMustHaveItemsRule(ICollection<OrderItem> orderItems)
-            {
-                _orderItems = orderItems;
-            }
-
-            public bool IsBroken() => !_orderItems.Any();
-
-            public string Message => "Order must have at least one item";
+            _orderItems = orderItems ?? throw new ArgumentNullException(nameof(orderItems));
         }
 
-        public class OrderTotalMustBePositiveRule : IBusinessRule
+        public override bool IsBroken() => !_orderItems.Any();
+
+        public override string Message => "سفارش باید حداقل یک آیتم داشته باشد";
+
+        public override string RuleName => "OrderMustHaveItems";
+
+        public override string ErrorCode => "ORDER_001";
+
+        public override bool IsCritical => true;
+    }
+
+    public class OrderTotalAmountMustBePositiveRule : BaseBusinessRule
+    {
+        private readonly Money _totalAmount;
+
+        public OrderTotalAmountMustBePositiveRule(Money totalAmount)
         {
-            private readonly Money _totalAmount;
-
-            public OrderTotalMustBePositiveRule(Money totalAmount)
-            {
-                _totalAmount = totalAmount;
-            }
-
-            public bool IsBroken() => _totalAmount.Amount <= 0;
-
-            public string Message => "Order total amount must be greater than zero";
+            _totalAmount = totalAmount;
         }
 
-        public class CustomerMustBeActiveRule : IBusinessRule
+        public override bool IsBroken() => _totalAmount.Amount <= 0;
+
+        public override string Message => "مبلغ کل سفارش باید بیشتر از صفر باشد";
+
+        public override string RuleName => "OrderTotalAmountMustBePositive";
+
+        public override string ErrorCode => "ORDER_002";
+
+        public override bool IsCritical => true;
+    }
+
+    public class OrderCanBeCancelledRule : BaseBusinessRule
+    {
+        private readonly OrderStatus _currentStatus;
+
+        public OrderCanBeCancelledRule(OrderStatus currentStatus)
         {
-            private readonly Customer _customer;
-
-            public CustomerMustBeActiveRule(Customer customer)
-            {
-                _customer = customer;
-            }
-
-            public bool IsBroken() => !_customer.IsActive();
-
-            public string Message => "Customer must be active to create an order";
+            _currentStatus = currentStatus;
         }
 
-        public class CustomerMustNotBeBlockedRule : IBusinessRule
+        public override bool IsBroken() => !CanBeCancelled(_currentStatus);
+
+        public override string Message => "سفارش در این وضعیت قابل لغو نیست";
+
+        public override string RuleName => "OrderCanBeCancelled";
+
+        public override string ErrorCode => "ORDER_003";
+
+        public override bool IsCritical => false;
+
+        private bool CanBeCancelled(OrderStatus status)
         {
-            private readonly Customer _customer;
+            return status == OrderStatus.Pending || status == OrderStatus.Confirmed;
+        }
+    }
 
-            public CustomerMustNotBeBlockedRule(Customer customer)
-            {
-                _customer = customer;
-            }
+    public class OrderDiscountCannotExceedTotalRule : BaseBusinessRule
+    {
+        private readonly Money _discountAmount;
+        private readonly Money _totalAmount;
 
-            public bool IsBroken() => _customer.IsBlocked();
-
-            public string Message => "Blocked customers cannot create orders";
+        public OrderDiscountCannotExceedTotalRule(Money discountAmount, Money totalAmount)
+        {
+            _discountAmount = discountAmount;
+            _totalAmount = totalAmount;
         }
 
-        public class OrderItemsMustBeInStockRule : IBusinessRule
+        public override bool IsBroken() => _discountAmount.Amount > _totalAmount.Amount;
+
+        public override string Message => "مبلغ تخفیف نمی‌تواند بیشتر از مبلغ کل باشد";
+
+        public override string RuleName => "OrderDiscountCannotExceedTotal";
+
+        public override string ErrorCode => "ORDER_004";
+
+        public override bool IsCritical => true;
+    }
+
+    public class OrderMustHaveValidAddressesRule : BaseBusinessRule
+    {
+        private readonly Address _shippingAddress;
+        private readonly Address _billingAddress;
+
+        public OrderMustHaveValidAddressesRule(Address shippingAddress, Address billingAddress)
         {
-            private readonly ICollection<OrderItem> _orderItems;
-
-            public OrderItemsMustBeInStockRule(ICollection<OrderItem> orderItems)
-            {
-                _orderItems = orderItems;
-            }
-
-            public bool IsBroken()
-            {
-                return _orderItems.Any(item => !item.Product.IsInStock());
-            }
-
-            public string Message => "All order items must be in stock";
+            _shippingAddress = shippingAddress;
+            _billingAddress = billingAddress;
         }
 
-        public class OrderItemsMustHaveSufficientStockRule : IBusinessRule
+        public override bool IsBroken() => _shippingAddress == null || _billingAddress == null;
+
+        public override string Message => "سفارش باید آدرس ارسال و صورتحساب معتبر داشته باشد";
+
+        public override string RuleName => "OrderMustHaveValidAddresses";
+
+        public override string ErrorCode => "ORDER_005";
+
+        public override bool IsCritical => true;
+    }
+
+    public class OrderItemQuantityMustBePositiveRule : BaseBusinessRule
+    {
+        private readonly int _quantity;
+
+        public OrderItemQuantityMustBePositiveRule(int quantity)
         {
-            private readonly ICollection<OrderItem> _orderItems;
-
-            public OrderItemsMustHaveSufficientStockRule(ICollection<OrderItem> orderItems)
-            {
-                _orderItems = orderItems;
-            }
-
-            public bool IsBroken()
-            {
-                return _orderItems.Any(item => item.Quantity > item.Product.StockQuantity);
-            }
-
-            public string Message => "Insufficient stock for one or more items";
+            _quantity = quantity;
         }
 
-        public class OrderDiscountCannotExceedLimitRule : IBusinessRule
+        public override bool IsBroken() => _quantity <= 0;
+
+        public override string Message => "تعداد آیتم سفارش باید بیشتر از صفر باشد";
+
+        public override string RuleName => "OrderItemQuantityMustBePositive";
+
+        public override string ErrorCode => "ORDER_006";
+
+        public override bool IsCritical => true;
+    }
+
+    public class OrderItemPriceMustBePositiveRule : BaseBusinessRule
+    {
+        private readonly Money _price;
+
+        public OrderItemPriceMustBePositiveRule(Money price)
         {
-            private readonly Money _discountAmount;
-            private readonly Money _totalAmount;
-            private readonly decimal _maxDiscountPercentage;
-
-            public OrderDiscountCannotExceedLimitRule(Money discountAmount, Money totalAmount, decimal maxDiscountPercentage = 30)
-            {
-                _discountAmount = discountAmount;
-                _totalAmount = totalAmount;
-                _maxDiscountPercentage = maxDiscountPercentage;
-            }
-
-            public bool IsBroken()
-            {
-                if (_totalAmount.Amount == 0) return false;
-                var discountPercentage = (_discountAmount.Amount / _totalAmount.Amount) * 100;
-                return discountPercentage > _maxDiscountPercentage;
-            }
-
-            public string Message => $"Discount cannot exceed {_maxDiscountPercentage}% of total amount";
+            _price = price;
         }
 
-        public class OrderStatusTransitionMustBeValidRule : IBusinessRule
-        {
-            private readonly OrderStatus _currentStatus;
-            private readonly OrderStatus _newStatus;
+        public override bool IsBroken() => _price.Amount <= 0;
 
-            public OrderStatusTransitionMustBeValidRule(OrderStatus currentStatus, OrderStatus newStatus)
-            {
-                _currentStatus = currentStatus;
-                _newStatus = newStatus;
-            }
+        public override string Message => "قیمت آیتم سفارش باید بیشتر از صفر باشد";
 
-            public bool IsBroken()
-            {
-                return !IsValidTransition(_currentStatus, _newStatus);
-            }
+        public override string RuleName => "OrderItemPriceMustBePositive";
 
-            public string Message => $"Cannot change order status from {_currentStatus} to {_newStatus}";
+        public override string ErrorCode => "ORDER_007";
 
-            private bool IsValidTransition(OrderStatus currentStatus, OrderStatus newStatus)
-            {
-                return (currentStatus, newStatus) switch
-                {
-                    (OrderStatus.Pending, OrderStatus.Confirmed) => true,
-                    (OrderStatus.Pending, OrderStatus.Cancelled) => true,
-                    (OrderStatus.Confirmed, OrderStatus.Processing) => true,
-                    (OrderStatus.Confirmed, OrderStatus.Cancelled) => true,
-                    (OrderStatus.Processing, OrderStatus.Shipped) => true,
-                    (OrderStatus.Shipped, OrderStatus.Delivered) => true,
-                    (OrderStatus.Delivered, OrderStatus.Refunded) => true,
-                    (OrderStatus.Delivered, OrderStatus.Returned) => true,
-                    _ => false
-                };
-            }
-        }
-
-        public class OrderMustHaveValidAddressesRule : IBusinessRule
-        {
-            private readonly Address _shippingAddress;
-            private readonly Address _billingAddress;
-
-            public OrderMustHaveValidAddressesRule(Address shippingAddress, Address billingAddress)
-            {
-                _shippingAddress = shippingAddress;
-                _billingAddress = billingAddress;
-            }
-
-            public bool IsBroken()
-            {
-                return _shippingAddress == null || _billingAddress == null ||
-                       !_shippingAddress.IsComplete() || !_billingAddress.IsComplete();
-            }
-
-            public string Message => "Order must have valid shipping and billing addresses";
-        }
-
-        public class OrderCannotBeModifiedAfterDeliveryRule : IBusinessRule
-        {
-            private readonly OrderStatus _status;
-
-            public OrderCannotBeModifiedAfterDeliveryRule(OrderStatus status)
-            {
-                _status = status;
-            }
-
-            public bool IsBroken()
-            {
-                return _status == OrderStatus.Delivered || 
-                       _status == OrderStatus.Refunded || 
-                       _status == OrderStatus.Returned;
-            }
-
-            public string Message => "Order cannot be modified after delivery";
-        }
+        public override bool IsCritical => true;
     }
 } 

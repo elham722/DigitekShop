@@ -1,7 +1,7 @@
 using AutoMapper;
+using DigitekShop.Application.DTOs.Product;
 using DigitekShop.Domain.Entities;
 using DigitekShop.Domain.ValueObjects;
-using DigitekShop.Application.DTOs.Product;
 
 namespace DigitekShop.Application.Profiles
 {
@@ -9,40 +9,49 @@ namespace DigitekShop.Application.Profiles
     {
         public ProductMappingProfile()
         {
-            // Entity to DTO mappings
+            // Product -> ProductDto
             CreateMap<Product, ProductDto>()
                 .ForMember(dest => dest.Name, opt => opt.MapFrom(src => src.Name.Value))
-                .ForMember(dest => dest.SKU, opt => opt.MapFrom(src => src.SKU.Value))
                 .ForMember(dest => dest.Price, opt => opt.MapFrom(src => src.Price.Amount))
-                .ForMember(dest => dest.Currency, opt => opt.MapFrom(src => src.Price.Currency))
-                .ForMember(dest => dest.CategoryName, opt => opt.MapFrom(src => src.Category != null ? src.Category.Name : string.Empty))
-                .ForMember(dest => dest.BrandName, opt => opt.MapFrom(src => src.Brand != null ? src.Brand.Name : string.Empty))
-                .ForMember(dest => dest.Brand, opt => opt.MapFrom(src => src.Brand != null ? src.Brand.Name : string.Empty));
-
-            CreateMap<Product, ProductListDto>()
-                .ForMember(dest => dest.Name, opt => opt.MapFrom(src => src.Name.Value))
                 .ForMember(dest => dest.SKU, opt => opt.MapFrom(src => src.SKU.Value))
-                .ForMember(dest => dest.Price, opt => opt.MapFrom(src => src.Price.Amount))
                 .ForMember(dest => dest.Currency, opt => opt.MapFrom(src => src.Price.Currency))
-                .ForMember(dest => dest.CategoryName, opt => opt.MapFrom(src => src.Category != null ? src.Category.Name : string.Empty))
-                .ForMember(dest => dest.BrandName, opt => opt.MapFrom(src => src.Brand != null ? src.Brand.Name : string.Empty));
+                .ForMember(dest => dest.CategoryName, opt => opt.MapFrom(src => src.Category.Name))
+                .ForMember(dest => dest.BrandName, opt => opt.MapFrom(src => src.Brand.Name))
+                .ForMember(dest => dest.AverageRating, opt => opt.MapFrom(src => src.GetAverageRating().Value))
+                .ForMember(dest => dest.ReviewCount, opt => opt.MapFrom(src => src.GetReviewCount()));
 
-            // DTO to Entity mappings
+            // CreateProductDto -> Product
             CreateMap<CreateProductDto, Product>()
-                .ConstructUsing((src, context) => new Product(
+                .ConstructUsing((src, context) => Product.Create(
                     new ProductName(src.Name),
                     src.Description,
-                    new Money(src.Price, src.Currency),
+                    new Money(src.Price, "IRR"),
                     src.StockQuantity,
                     new SKU(src.SKU),
                     src.CategoryId,
                     src.BrandId,
-                    src.Model ?? "",
-                    src.Weight))
-                .ForMember(dest => dest.ImageUrl, opt => opt.MapFrom(src => src.ImageUrl));
+                    src.Model,
+                    src.Weight
+                ));
 
+            // UpdateProductDto -> Product (partial update)
             CreateMap<UpdateProductDto, Product>()
-                .ForAllMembers(opts => opts.Condition((src, dest, srcMember) => srcMember != null));
+                .ForMember(dest => dest.Name, opt => opt.MapFrom(src => 
+                    string.IsNullOrEmpty(src.Name) ? null : new ProductName(src.Name)))
+                .ForMember(dest => dest.Price, opt => opt.MapFrom(src => 
+                    !src.Price.HasValue ? null : new Money(src.Price.Value, "IRR")))
+                .ForMember(dest => dest.SKU, opt => opt.MapFrom(src => 
+                    string.IsNullOrEmpty(src.SKU) ? null : new SKU(src.SKU)));
+
+            // ProductListDto mapping
+            CreateMap<Product, ProductListDto>()
+                .ForMember(dest => dest.Name, opt => opt.MapFrom(src => src.Name.Value))
+                .ForMember(dest => dest.Price, opt => opt.MapFrom(src => src.Price.Amount))
+                .ForMember(dest => dest.SKU, opt => opt.MapFrom(src => src.SKU.Value))
+                .ForMember(dest => dest.CategoryName, opt => opt.MapFrom(src => src.Category.Name))
+                .ForMember(dest => dest.BrandName, opt => opt.MapFrom(src => src.Brand.Name))
+                .ForMember(dest => dest.AverageRating, opt => opt.MapFrom(src => src.GetAverageRating().Value))
+                .ForMember(dest => dest.ReviewCount, opt => opt.MapFrom(src => src.GetReviewCount()));
         }
     }
 } 

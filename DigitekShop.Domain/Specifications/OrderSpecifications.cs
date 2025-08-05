@@ -5,152 +5,235 @@ using DigitekShop.Domain.Enums;
 
 namespace DigitekShop.Domain.Specifications
 {
-    public class OrderSpecifications
+    public class OrderByCustomerSpecification : BaseSpecification<Order>
     {
-        public class OrdersByCustomerSpecification : BaseSpecification<Order>
+        public OrderByCustomerSpecification(int customerId)
         {
-            public OrdersByCustomerSpecification(int customerId)
-            {
-                AddCriteria(o => o.CustomerId == customerId);
-                AddInclude(o => o.Customer);
-                AddInclude(o => o.OrderItems);
-                AddOrderByDescending(o => o.CreatedAt);
-            }
+            AddCriteria(o => o.CustomerId == customerId);
+            AddInclude(o => o.Customer);
+            AddInclude(o => o.OrderItems);
+            AddOrderByDescending(o => o.CreatedAt);
         }
+    }
 
-        public class OrdersByStatusSpecification : BaseSpecification<Order>
+    public class OrderByStatusSpecification : BaseSpecification<Order>
+    {
+        public OrderByStatusSpecification(OrderStatus status)
         {
-            public OrdersByStatusSpecification(OrderStatus status)
-            {
-                AddCriteria(o => o.Status == status);
-                AddInclude(o => o.Customer);
-                AddInclude(o => o.OrderItems);
-                AddOrderByDescending(o => o.CreatedAt);
-            }
+            AddCriteria(o => o.Status == status);
+            AddInclude(o => o.Customer);
+            AddInclude(o => o.OrderItems);
+            AddOrderByDescending(o => o.CreatedAt);
         }
+    }
 
-        public class PendingOrdersSpecification : BaseSpecification<Order>
+    public class OrderByDateRangeSpecification : BaseSpecification<Order>
+    {
+        public OrderByDateRangeSpecification(DateTime startDate, DateTime endDate)
         {
-            public PendingOrdersSpecification()
-            {
-                AddCriteria(o => o.Status == OrderStatus.Pending);
-                AddInclude(o => o.Customer);
-                AddInclude(o => o.OrderItems);
-                AddOrderBy(o => o.CreatedAt);
-            }
+            AddCriteria(o => o.CreatedAt >= startDate && o.CreatedAt <= endDate);
+            AddInclude(o => o.Customer);
+            AddInclude(o => o.OrderItems);
+            AddOrderByDescending(o => o.CreatedAt);
         }
+    }
 
-        public class ProcessingOrdersSpecification : BaseSpecification<Order>
+    public class OrderByAmountRangeSpecification : BaseSpecification<Order>
+    {
+        public OrderByAmountRangeSpecification(decimal minAmount, decimal maxAmount)
         {
-            public ProcessingOrdersSpecification()
-            {
-                AddCriteria(o => o.Status == OrderStatus.Processing);
-                AddInclude(o => o.Customer);
-                AddInclude(o => o.OrderItems);
-                AddOrderBy(o => o.CreatedAt);
-            }
+            AddCriteria(o => o.TotalAmount.Amount >= minAmount && o.TotalAmount.Amount <= maxAmount);
+            AddInclude(o => o.Customer);
+            AddInclude(o => o.OrderItems);
+            AddOrderByDescending(o => o.TotalAmount.Amount);
         }
+    }
 
-        public class ShippedOrdersSpecification : BaseSpecification<Order>
+    public class OrderPendingSpecification : BaseSpecification<Order>
+    {
+        public OrderPendingSpecification()
         {
-            public ShippedOrdersSpecification()
-            {
-                AddCriteria(o => o.Status == OrderStatus.Shipped);
-                AddInclude(o => o.Customer);
-                AddInclude(o => o.OrderItems);
-                AddOrderByDescending(o => o.ShippedAt);
-            }
+            AddCriteria(o => o.Status == OrderStatus.Pending);
+            AddInclude(o => o.Customer);
+            AddInclude(o => o.OrderItems);
+            AddOrderBy(o => o.CreatedAt);
         }
+    }
 
-        public class DeliveredOrdersSpecification : BaseSpecification<Order>
+    public class OrderConfirmedSpecification : BaseSpecification<Order>
+    {
+        public OrderConfirmedSpecification()
         {
-            public DeliveredOrdersSpecification()
-            {
-                AddCriteria(o => o.Status == OrderStatus.Delivered);
-                AddInclude(o => o.Customer);
-                AddInclude(o => o.OrderItems);
-                AddOrderByDescending(o => o.DeliveredAt);
-            }
+            AddCriteria(o => o.Status == OrderStatus.Confirmed);
+            AddInclude(o => o.Customer);
+            AddInclude(o => o.OrderItems);
+            AddOrderBy(o => o.CreatedAt);
         }
+    }
 
-        public class CancelledOrdersSpecification : BaseSpecification<Order>
+    public class OrderProcessingSpecification : BaseSpecification<Order>
+    {
+        public OrderProcessingSpecification()
         {
-            public CancelledOrdersSpecification()
-            {
-                AddCriteria(o => o.Status == OrderStatus.Cancelled);
-                AddInclude(o => o.Customer);
-                AddInclude(o => o.OrderItems);
-                AddOrderByDescending(o => o.UpdatedAt);
-            }
+            AddCriteria(o => o.Status == OrderStatus.Processing);
+            AddInclude(o => o.Customer);
+            AddInclude(o => o.OrderItems);
+            AddOrderBy(o => o.CreatedAt);
         }
+    }
 
-        public class OrdersByDateRangeSpecification : BaseSpecification<Order>
+    public class OrderShippedSpecification : BaseSpecification<Order>
+    {
+        public OrderShippedSpecification()
         {
-            public OrdersByDateRangeSpecification(DateTime startDate, DateTime endDate)
-            {
-                AddCriteria(o => o.CreatedAt >= startDate && o.CreatedAt <= endDate);
-                AddInclude(o => o.Customer);
-                AddInclude(o => o.OrderItems);
-                AddOrderByDescending(o => o.CreatedAt);
-            }
+            AddCriteria(o => o.Status == OrderStatus.Shipped);
+            AddInclude(o => o.Customer);
+            AddInclude(o => o.OrderItems);
+            AddOrderBy(o => o.ShippedAt);
         }
+    }
 
-        public class HighValueOrdersSpecification : BaseSpecification<Order>
+    public class OrderDeliveredSpecification : BaseSpecification<Order>
+    {
+        public OrderDeliveredSpecification()
         {
-            public HighValueOrdersSpecification(decimal minAmount = 1000000m)
-            {
-                AddCriteria(o => o.TotalAmount.Amount >= minAmount);
-                AddInclude(o => o.Customer);
-                AddInclude(o => o.OrderItems);
-                AddOrderByDescending(o => o.TotalAmount.Amount);
-            }
+            AddCriteria(o => o.Status == OrderStatus.Delivered);
+            AddInclude(o => o.Customer);
+            AddInclude(o => o.OrderItems);
+            AddOrderByDescending(o => o.DeliveredAt);
         }
+    }
 
-        public class OrdersWithTrackingSpecification : BaseSpecification<Order>
+    public class OrderCancelledSpecification : BaseSpecification<Order>
+    {
+        public OrderCancelledSpecification()
         {
-            public OrdersWithTrackingSpecification()
-            {
-                AddCriteria(o => !string.IsNullOrEmpty(o.TrackingNumber));
-                AddInclude(o => o.Customer);
-                AddInclude(o => o.OrderItems);
-                AddOrderByDescending(o => o.ShippedAt);
-            }
+            AddCriteria(o => o.Status == OrderStatus.Cancelled);
+            AddInclude(o => o.Customer);
+            AddInclude(o => o.OrderItems);
+            AddOrderByDescending(o => o.UpdatedAt);
         }
+    }
 
-        public class OverdueOrdersSpecification : BaseSpecification<Order>
+    public class OrderOverdueSpecification : BaseSpecification<Order>
+    {
+        public OrderOverdueSpecification()
         {
-            public OverdueOrdersSpecification()
-            {
-                AddCriteria(o => o.EstimatedDeliveryDate.HasValue && 
-                                o.EstimatedDeliveryDate < DateTime.UtcNow && 
-                                o.Status != OrderStatus.Delivered && 
-                                o.Status != OrderStatus.Cancelled);
-                AddInclude(o => o.Customer);
-                AddInclude(o => o.OrderItems);
-                AddOrderBy(o => o.EstimatedDeliveryDate);
-            }
+            AddCriteria(o => o.EstimatedDeliveryDate.HasValue && 
+                             o.EstimatedDeliveryDate.Value < DateTime.UtcNow && 
+                             o.Status != OrderStatus.Delivered && 
+                             o.Status != OrderStatus.Cancelled);
+            AddInclude(o => o.Customer);
+            AddInclude(o => o.OrderItems);
+            AddOrderBy(o => o.EstimatedDeliveryDate);
         }
+    }
 
-        public class OrdersByPaymentMethodSpecification : BaseSpecification<Order>
+    public class OrderWithTrackingNumberSpecification : BaseSpecification<Order>
+    {
+        public OrderWithTrackingNumberSpecification()
         {
-            public OrdersByPaymentMethodSpecification(PaymentMethod paymentMethod)
-            {
-                AddCriteria(o => o.PaymentMethod == paymentMethod);
-                AddInclude(o => o.Customer);
-                AddInclude(o => o.OrderItems);
-                AddOrderByDescending(o => o.CreatedAt);
-            }
+            AddCriteria(o => !string.IsNullOrEmpty(o.TrackingNumber));
+            AddInclude(o => o.Customer);
+            AddInclude(o => o.OrderItems);
+            AddOrderByDescending(o => o.CreatedAt);
         }
+    }
 
-        public class OrdersWithPagingSpecification : BaseSpecification<Order>
+    public class OrderByPaymentMethodSpecification : BaseSpecification<Order>
+    {
+        public OrderByPaymentMethodSpecification(PaymentMethod paymentMethod)
         {
-            public OrdersWithPagingSpecification(int page, int pageSize)
+            AddCriteria(o => o.PaymentMethod == paymentMethod);
+            AddInclude(o => o.Customer);
+            AddInclude(o => o.OrderItems);
+            AddOrderByDescending(o => o.CreatedAt);
+        }
+    }
+
+    public class OrderWithDiscountSpecification : BaseSpecification<Order>
+    {
+        public OrderWithDiscountSpecification()
+        {
+            AddCriteria(o => o.DiscountAmount.Amount > 0);
+            AddInclude(o => o.Customer);
+            AddInclude(o => o.OrderItems);
+            AddOrderByDescending(o => o.DiscountAmount.Amount);
+        }
+    }
+
+    public class OrderHighValueSpecification : BaseSpecification<Order>
+    {
+        public OrderHighValueSpecification(decimal threshold = 1000000m)
+        {
+            AddCriteria(o => o.TotalAmount.Amount >= threshold);
+            AddInclude(o => o.Customer);
+            AddInclude(o => o.OrderItems);
+            AddOrderByDescending(o => o.TotalAmount.Amount);
+        }
+    }
+
+    public class OrderRecentSpecification : BaseSpecification<Order>
+    {
+        public OrderRecentSpecification(int days = 7)
+        {
+            var cutoffDate = DateTime.UtcNow.AddDays(-days);
+            AddCriteria(o => o.CreatedAt >= cutoffDate);
+            AddInclude(o => o.Customer);
+            AddInclude(o => o.OrderItems);
+            AddOrderByDescending(o => o.CreatedAt);
+        }
+    }
+
+    public class OrderWithPagingSpecification : BaseSpecification<Order>
+    {
+        public OrderWithPagingSpecification(int page, int pageSize, OrderStatus? status = null, int? customerId = null)
+        {
+            var skip = (page - 1) * pageSize;
+            ApplyPaging(skip, pageSize);
+
+            Expression<Func<Order, bool>> criteria = o => true;
+
+            if (status.HasValue)
             {
-                AddInclude(o => o.Customer);
-                AddInclude(o => o.OrderItems);
-                AddOrderByDescending(o => o.CreatedAt);
-                ApplyPaging((page - 1) * pageSize, pageSize);
+                criteria = o => o.Status == status.Value;
             }
+
+            if (customerId.HasValue)
+            {
+                criteria = o => o.CustomerId == customerId.Value;
+            }
+
+            if (status.HasValue && customerId.HasValue)
+            {
+                criteria = o => o.Status == status.Value && o.CustomerId == customerId.Value;
+            }
+
+            AddCriteria(criteria);
+            AddInclude(o => o.Customer);
+            AddInclude(o => o.OrderItems);
+            AddOrderByDescending(o => o.CreatedAt);
+        }
+    }
+
+    public class OrderByOrderNumberSpecification : BaseSpecification<Order>
+    {
+        public OrderByOrderNumberSpecification(string orderNumber)
+        {
+            AddCriteria(o => o.OrderNumber.Value == orderNumber);
+            AddInclude(o => o.Customer);
+            AddInclude(o => o.OrderItems);
+        }
+    }
+
+    public class OrderWithItemsSpecification : BaseSpecification<Order>
+    {
+        public OrderWithItemsSpecification()
+        {
+            AddCriteria(o => o.OrderItems.Any());
+            AddInclude(o => o.Customer);
+            AddInclude(o => o.OrderItems);
+            AddOrderByDescending(o => o.CreatedAt);
         }
     }
 } 
