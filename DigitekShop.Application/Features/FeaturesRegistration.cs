@@ -4,6 +4,7 @@ using DigitekShop.Application.DTOs.Common;
 using DigitekShop.Application.DTOs.Customer;
 using DigitekShop.Application.DTOs.Order;
 using DigitekShop.Application.DTOs.Product;
+using DigitekShop.Application.DTOs.Inventory;
 using DigitekShop.Application.Features.Products.Commands.CreateProduct;
 using DigitekShop.Application.Features.Products.Commands.UpdateProduct;
 using DigitekShop.Application.Features.Products.Commands.DeleteProduct;
@@ -13,6 +14,8 @@ using DigitekShop.Application.Features.Customers.Commands.CreateCustomer;
 using DigitekShop.Application.Features.Customers.Queries.GetCustomers;
 using DigitekShop.Application.Features.Orders.Commands.CreateOrder;
 using DigitekShop.Application.Features.Orders.Queries.GetOrders;
+using DigitekShop.Application.Features.Inventory.Commands.CreateInventory;
+using DigitekShop.Application.Features.Inventory.Queries.GetInventory;
 using DigitekShop.Application.Services;
 using DigitekShop.Application.Interfaces;
 using DigitekShop.Application.Validators.Products;
@@ -53,6 +56,12 @@ namespace DigitekShop.Application.Features
 
             // Order Queries
             services.AddScoped<IQueryHandler<GetOrdersQuery, PagedResultDto<OrderDto>>, GetOrdersQueryHandler>();
+
+            // Inventory Commands
+            services.AddScoped<ICommandHandler<CreateInventoryCommand, InventoryDto>, CreateInventoryCommandHandler>();
+
+            // Inventory Queries
+            services.AddScoped<IQueryHandler<GetInventoryQuery, InventoryDto>, GetInventoryQueryHandler>();
 
             return services;
         }
