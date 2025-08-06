@@ -7,6 +7,7 @@ using DigitekShop.Api.Middleware;
 using DigitekShop.Domain.Services;
 using DigitekShop.Identity;
 using Microsoft.OpenApi.Models;
+using DigitekShop.Application.Middleware;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -34,6 +35,7 @@ if (app.Environment.IsDevelopment())
 {
     app.UseSwaggerDocumentation();
 }
+app.UseMiddleware<GlobalExceptionHandlerMiddleware>();
 
 app.UseHttpsRedirection();
 

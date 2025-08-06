@@ -2,24 +2,24 @@ using FluentValidation.Results;
 
 namespace DigitekShop.Application.Exceptions
 {
-    public class ValidationException : Exception
+    public class ApplicationValidationException : Exception
     {
-        public ValidationException() : base()
+        public ApplicationValidationException() : base()
         {
             Errors = new List<string>();
         }
 
-        public ValidationException(IEnumerable<ValidationFailure> failures) : this()
+        public ApplicationValidationException(IEnumerable<ValidationFailure> failures) : this()
         {
             Errors = failures.Select(e => e.ErrorMessage).ToList();
         }
 
-        public ValidationException(string message) : base(message)
+        public ApplicationValidationException(string message) : base(message)
         {
             Errors = new List<string> { message };
         }
 
-        public ValidationException(ValidationResult validationResult) : this()
+        public ApplicationValidationException(ValidationResult validationResult) : this()
         {
             foreach (var err in validationResult.Errors)
             {

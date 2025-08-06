@@ -2,10 +2,14 @@
 using System.Reflection;
 using Microsoft.Extensions.DependencyInjection;
 using AutoMapper;
+using FluentValidation;
 using DigitekShop.Application.Profiles;
 using DigitekShop.Application.Features;
 using DigitekShop.Application.Services;
 using DigitekShop.Application.Interfaces;
+using DigitekShop.Application.Validators.Identity;
+using DigitekShop.Application.DTOs.Identity;
+using DigitekShop.Application.Extensions;
 using DigitekShop.Domain.Services;
 
 namespace DigitekShop.Application
@@ -18,15 +22,17 @@ namespace DigitekShop.Application
             services.AddAutoMapper(cfg => cfg.AddMaps(Assembly.GetExecutingAssembly()));
 
             // Register Features (Commands and Queries)
-            services.AddFeatures();
+            services.AddApplicationFeatures();
             services.AddScoped<OrderDomainService>();
 
-            // Register Dispatchers
-            services.AddScoped<IQueryDispatcher, QueryDispatcher>();
-            services.AddScoped<ICommandDispatcher, CommandDispatcher>();
+            // Register Application Services
+            services.AddApplicationServices();
 
             // Fix for CS1503: Use a lambda to configure MediatRServiceConfiguration
             services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(Assembly.GetExecutingAssembly()));
+
+            // Register FluentValidation validators
+            services.AddApplicationValidators();
 
             return services;
         }

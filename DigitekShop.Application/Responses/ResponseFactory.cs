@@ -1,4 +1,5 @@
 using DigitekShop.Application.DTOs.Common;
+using System.Linq;
 
 namespace DigitekShop.Application.Responses
 {
@@ -46,6 +47,12 @@ namespace DigitekShop.Application.Responses
 
         public static ErrorResponse CreateValidationError(List<string> errors, string message = "Validation failed")
         {
+            return ErrorResponse.CreateValidationError(errors, message);
+        }
+
+        public static ErrorResponse CreateValidationError(IEnumerable<FluentValidation.Results.ValidationFailure> validationFailures, string message = "Validation failed")
+        {
+            var errors = validationFailures.Select(failure => failure.ErrorMessage).ToList();
             return ErrorResponse.CreateValidationError(errors, message);
         }
 

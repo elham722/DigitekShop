@@ -9,6 +9,7 @@ using DigitekShop.Domain.ValueObjects;
 using DigitekShop.Domain.Enums;
 using DigitekShop.Domain.Exceptions;
 using AutoMapper;
+using FluentValidation;
 
 namespace DigitekShop.Application.Features.Products.Commands.CreateProduct
 {

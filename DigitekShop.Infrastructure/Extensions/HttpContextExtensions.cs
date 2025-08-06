@@ -2,7 +2,7 @@ using Microsoft.AspNetCore.Http;
 using DigitekShop.Application.Interfaces;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace DigitekShop.Application.Extensions
+namespace DigitekShop.Infrastructure.Extensions
 {
     public static class HttpContextExtensions
     {

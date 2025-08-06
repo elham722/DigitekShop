@@ -8,6 +8,7 @@ using DigitekShop.Application.DTOs.Common;
 using DigitekShop.Application.Exceptions;
 using DigitekShop.Domain.Exceptions;
 using DigitekShop.Application.Responses;
+using FluentValidation;
 
 namespace DigitekShop.Application.Middleware
 {
@@ -48,9 +49,64 @@ namespace DigitekShop.Application.Middleware
                     errorResponse = ResponseFactory.CreateValidationError(validationEx.Errors);
                     break;
 
+                // Identity Exceptions (must come before BadRequestException)
+                case UserNotFoundException userNotFoundEx:
+                    response.StatusCode = (int)HttpStatusCode.NotFound;
+                    errorResponse = ResponseFactory.CreateNotFound("User", userNotFoundEx.UserId ?? userNotFoundEx.Email);
+                    break;
+
+                case RoleNotFoundException roleNotFoundEx:
+                    response.StatusCode = (int)HttpStatusCode.NotFound;
+                    errorResponse = ResponseFactory.CreateNotFound("Role", roleNotFoundEx.RoleId ?? roleNotFoundEx.RoleName);
+                    break;
+
+                case PermissionNotFoundException permissionNotFoundEx:
+                    response.StatusCode = (int)HttpStatusCode.NotFound;
+                    errorResponse = ResponseFactory.CreateNotFound("Permission", permissionNotFoundEx.PermissionId ?? permissionNotFoundEx.PermissionName);
+                    break;
+
                 case NotFoundException notFoundEx:
                     response.StatusCode = (int)HttpStatusCode.NotFound;
                     errorResponse = ResponseFactory.CreateError(notFoundEx.Message, "NOT_FOUND");
+                    break;
+                case InvalidPasswordException invalidPasswordEx:
+                    response.StatusCode = (int)HttpStatusCode.BadRequest;
+                    errorResponse = ResponseFactory.CreateError(invalidPasswordEx.Message, "INVALID_PASSWORD");
+                    break;
+
+                case InvalidTokenException invalidTokenEx:
+                    response.StatusCode = (int)HttpStatusCode.BadRequest;
+                    errorResponse = ResponseFactory.CreateError(invalidTokenEx.Message, "INVALID_TOKEN");
+                    break;
+
+                case TwoFactorAuthenticationException twoFactorEx:
+                    response.StatusCode = (int)HttpStatusCode.BadRequest;
+                    errorResponse = ResponseFactory.CreateError(twoFactorEx.Message, "TWO_FACTOR_ERROR");
+                    break;
+
+                case TermsNotAcceptedException termsNotAcceptedEx:
+                    response.StatusCode = (int)HttpStatusCode.BadRequest;
+                    errorResponse = ResponseFactory.CreateError(termsNotAcceptedEx.Message, "TERMS_NOT_ACCEPTED");
+                    break;
+
+                case PasswordExpiredException passwordExpiredEx:
+                    response.StatusCode = (int)HttpStatusCode.BadRequest;
+                    errorResponse = ResponseFactory.CreateError(passwordExpiredEx.Message, "PASSWORD_EXPIRED");
+                    break;
+
+                case DuplicateUserException duplicateUserEx:
+                    response.StatusCode = (int)HttpStatusCode.Conflict;
+                    errorResponse = ResponseFactory.CreateDuplicate("User", "Email", duplicateUserEx.Email ?? duplicateUserEx.UserName);
+                    break;
+
+                case DuplicateRoleException duplicateRoleEx:
+                    response.StatusCode = (int)HttpStatusCode.Conflict;
+                    errorResponse = ResponseFactory.CreateDuplicate("Role", "Name", duplicateRoleEx.RoleName);
+                    break;
+
+                case DuplicatePermissionException duplicatePermissionEx:
+                    response.StatusCode = (int)HttpStatusCode.Conflict;
+                    errorResponse = ResponseFactory.CreateDuplicate("Permission", "Name", duplicatePermissionEx.PermissionName);
                     break;
 
                 case BadRequestException badRequestEx:
@@ -84,6 +140,42 @@ namespace DigitekShop.Application.Middleware
                     errorResponse = ResponseFactory.CreateNotFound("Order", orderNotFoundEx.OrderId);
                     break;
 
+                case DuplicateEntityException duplicateEntityEx:
+                    response.StatusCode = (int)HttpStatusCode.Conflict;
+                    errorResponse = ResponseFactory.CreateDuplicate(
+                        duplicateEntityEx.EntityType, 
+                        duplicateEntityEx.PropertyName, 
+                        duplicateEntityEx.PropertyValue);
+                    break;
+
+
+
+                case SessionExpiredException sessionExpiredEx:
+                    response.StatusCode = (int)HttpStatusCode.Unauthorized;
+                    errorResponse = ResponseFactory.CreateError(sessionExpiredEx.Message, "SESSION_EXPIRED");
+                    break;
+
+                case InvalidCredentialsException invalidCredentialsEx:
+                    response.StatusCode = (int)HttpStatusCode.Unauthorized;
+                    errorResponse = ResponseFactory.CreateError(invalidCredentialsEx.Message, "INVALID_CREDENTIALS");
+                    break;
+
+                case EmailNotConfirmedException emailNotConfirmedEx:
+                    response.StatusCode = (int)HttpStatusCode.BadRequest;
+                    errorResponse = ResponseFactory.CreateError(emailNotConfirmedEx.Message, "EMAIL_NOT_CONFIRMED");
+                    break;
+
+                case AccountLockedException accountLockedEx:
+                    response.StatusCode = (int)HttpStatusCode.Forbidden;
+                    errorResponse = ResponseFactory.CreateError(accountLockedEx.Message, "ACCOUNT_LOCKED");
+                    break;
+
+                // Domain Exceptions (must come before DomainException)
+                case InvalidProductDataException invalidProductDataEx:
+                    response.StatusCode = (int)HttpStatusCode.BadRequest;
+                    errorResponse = ResponseFactory.CreateError(invalidProductDataEx.Message, "INVALID_DATA");
+                    break;
+
                 case InsufficientStockException insufficientStockEx:
                     response.StatusCode = (int)HttpStatusCode.BadRequest;
                     errorResponse = ResponseFactory.CreateBusinessRuleViolation(insufficientStockEx.Message);
@@ -97,19 +189,6 @@ namespace DigitekShop.Application.Middleware
                 case CustomerNotActiveException customerNotActiveEx:
                     response.StatusCode = (int)HttpStatusCode.BadRequest;
                     errorResponse = ResponseFactory.CreateBusinessRuleViolation(customerNotActiveEx.Message);
-                    break;
-
-                case InvalidProductDataException invalidProductDataEx:
-                    response.StatusCode = (int)HttpStatusCode.BadRequest;
-                    errorResponse = ResponseFactory.CreateError(invalidProductDataEx.Message, "INVALID_DATA");
-                    break;
-
-                case DuplicateEntityException duplicateEntityEx:
-                    response.StatusCode = (int)HttpStatusCode.Conflict;
-                    errorResponse = ResponseFactory.CreateDuplicate(
-                        duplicateEntityEx.EntityType, 
-                        duplicateEntityEx.PropertyName, 
-                        duplicateEntityEx.PropertyValue);
                     break;
 
                 case DomainException domainEx:

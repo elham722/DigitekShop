@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Builder;
 using DigitekShop.Application.Middleware;
 
-namespace DigitekShop.Application.Extensions
+namespace DigitekShop.Infrastructure.Extensions
 {
     public static class MiddlewareExtensions
     {
